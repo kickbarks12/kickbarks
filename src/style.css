@@ -1,0 +1,40 @@
+* {
+  border: 0 !important;
+}
+html {
+  scroll-behavior: smooth;
+}
+section {
+  padding: 100px 0;
+  min-height: 100vh;
+}
+#home {
+  background-color: black;
+}
+#products {
+  background-color: black;
+}
+#about-us {
+  background-color: black;
+}
+#contact-us {
+  background-color: black;
+}
+.title-header {
+  background-color: lightcoral;
+  padding: 10px;
+  border-radius: 50px;
+  margin: 10 auto;
+   list-style-position: inside;
+}
+.navbar-brand,
+.nav-link {
+  color: white !important;
+}
+.lightblue {
+  background-color: rgb(221, 100, 100);
+  padding: 10px;
+  border-radius: 50px; 
+
+}
+
