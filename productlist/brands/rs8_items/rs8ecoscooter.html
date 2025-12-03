@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body class="reveal">
+    <nav
+      class="navbar navbar-expand-lg fixed-top bg-dark"
+      style="font-weight: bold"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand text-white" href="../../../Index.html"
+          >Kickbarks</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link active text-white"
+                aria-current="page"
+                href="../../../Index.html"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="../../../products.html"
+                >Products</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="../../../aboutus.html"
+                >About Us</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="../../../contactus.html"
+                >Contact Us</a
+              >
+            </li>
+          </ul>
+          <a href="./cart.html" class="text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2 1a1 1 0 0 0-1 1v1h14V2a1 1 0 0 0-1-1H2zM1 5h14l-1.5 9h-11L1 5zm4 2v5h1V7H5zm3 0v5h1V7H8zm3 0v5h1V7h-1z"
+              />
+            </svg>
+          </a>
+
+          <form class="d-flex" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <section
+      style="
+        background-image: url(../../../image/Motorcycle.png);
+        margin-top: 50px;
+        padding-bottom: 100px;
+        padding-top: 10px;
+      "
+    >
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="card h-100">
+              <img
+                class="container d-flex justify-content-center align-items-center"
+                src="../../../image/rs8ecoscooter.png"
+                class="card-img-top"
+                alt="Product 1"
+                style="width: 400px"
+              />
+
+              <div class="card-body">
+                <h5 class="card-title">
+                  RS8 ECO SCOOTER 10W-40 API SL SYNTHETIC MOTORCYCLE ENGINE OIL
+                </h5>
+                <h3>Fully Synthetic 10W-40 API SM 4T Racing — RS8 Oil</h3>
+
+                <h4>Types</h4>
+                <ul>
+                  <li>4-Stroke (4T)</li>
+                  <li>Fully Synthetic</li>
+                  <li>JASO MB</li>
+                  <li>API SM</li>
+                  <li>Long Life Formula</li>
+                </ul>
+
+                <h4>Properties</h4>
+                <ul>
+                  <li>Clean formulation</li>
+                  <li>PAO formulated</li>
+                  <li>Race performance</li>
+                  <li>Heat protection</li>
+                  <li>5x Anti-Wear protection</li>
+                  <li>All-season performance</li>
+                </ul>
+
+                <h4>Key Benefits</h4>
+                <ul>
+                  <li>
+                    Special anti-wear components provide more than 5× protection
+                    compared to common oil and help prevent clutch slippage and
+                    reduce pitting and corrosion in the transmission system.
+                  </li>
+                  <li>
+                    Excellent cleaning performance to suppress combustion
+                    deposits and buildup even at high engine temperatures.
+                  </li>
+                  <li>
+                    Superior shear resistance for stable and powerful engine
+                    performance.
+                  </li>
+                  <li>Smooth clutch response for better handling.</li>
+                  <li>Recommended for Matic/Scooter engines.</li>
+                </ul>
+
+                <h4>RS8 Oil Advantages</h4>
+                <ul>
+                  <li>
+                    Advanced formulation with high-quality base oils and
+                    additives
+                  </li>
+                  <li>Enhanced engine protection and reduced component wear</li>
+                  <li>Improved acceleration and power delivery</li>
+                  <li>Excellent thermal stability at high temperatures</li>
+                  <li>Corrosion and rust protection</li>
+                  <li>Smoother gear shifting</li>
+                  <li>Improved fuel efficiency</li>
+                  <li>Compatible with scooters and performance motorcycles</li>
+                </ul>
+              </div>
+
+              <div class="card-footer text-center">
+                <h4 class="text-muted">₱250</h4>
+                <div class="text-center mt-3 mb-4">
+                  <button class="btn btn-primary btn-lg" id="addToCartBtn">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reveals = document.querySelectorAll(".reveal");
+
+        const obs = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                // If you want it to animate only once, unobserve it:
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "0px 0px -10% 0px", // start a bit before element fully in view
+            threshold: 0,
+          }
+        );
+
+        reveals.forEach((el) => obs.observe(el));
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

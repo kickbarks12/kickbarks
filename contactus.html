@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
-  <body>
+  <body class="reveal">
     <nav
       class="navbar navbar-expand-lg fixed-top bg-dark"
       style="font-weight: bold"
@@ -45,6 +45,19 @@
               <a class="nav-link" href="contactus.html">Contact Us</a>
             </li>
           </ul>
+          <a href="./cart.html" class="text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2 1a1 1 0 0 0-1 1v1h14V2a1 1 0 0 0-1-1H2zM1 5h14l-1.5 9h-11L1 5zm4 2v5h1V7H5zm3 0v5h1V7H8zm3 0v5h1V7h-1z"
+              />
+            </svg>
+          </a>
         </div>
       </div>
     </nav>
@@ -63,7 +76,7 @@
         <div class="container">
           <h2
             style="
-              background-color: #9BC1BC;
+              background-color: #9bc1bc;
               display: inline-block;
               padding: 10px 40px;
               border-radius: 30px;
@@ -75,7 +88,7 @@
           <div style="text-align: center">
             <p
               style="
-                background-color: #9BC1BC;
+                background-color: #9bc1bc;
                 display: inline-block;
                 padding: 10px 40px;
                 border-radius: 30px;
@@ -91,7 +104,7 @@
               <div class="col-md-4 mb-4 lightblue">
                 <h5
                   style="
-                    background-color: #9BC1BC;
+                    background-color: #9bc1bc;
                     display: inline-block;
                     padding: 10px 40px;
                     border-radius: 30px;
@@ -101,7 +114,7 @@
                 </h5>
                 <p
                   style="
-                    background-color: #9BC1BC;
+                    background-color: #9bc1bc;
                     display: inline-block;
                     padding: 10px 40px;
                     border-radius: 30px;
@@ -114,7 +127,7 @@
               <div class="col-md-4 mb-4 lightblue">
                 <h5
                   style="
-                    background-color: #9BC1BC;
+                    background-color: #9bc1bc;
                     display: inline-block;
                     padding: 10px 40px;
                     border-radius: 30px;
@@ -125,7 +138,7 @@
                 <div style="text-align: center">
                   <p
                     style="
-                      background-color: #9BC1BC;
+                      background-color: #9bc1bc;
                       display: inline-block;
                       padding: 10px 40px;
                       border-radius: 30px;
@@ -139,7 +152,7 @@
               <div class="col-md-4 mb-4 lightblue">
                 <h5
                   style="
-                    background-color: #9BC1BC;
+                    background-color: #9bc1bc;
                     display: inline-block;
                     padding: 10px 40px;
                     border-radius: 30px;
@@ -149,7 +162,7 @@
                 </h5>
                 <p
                   style="
-                    background-color: #9BC1BC;
+                    background-color: #9bc1bc;
                     display: inline-block;
                     padding: 10px 40px;
                     border-radius: 30px;
@@ -208,6 +221,30 @@
         </div>
       </div>
     </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reveals = document.querySelectorAll(".reveal");
+
+        const obs = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                // If you want it to animate only once, unobserve it:
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "0px 0px -10% 0px", // start a bit before element fully in view
+            threshold: 0,
+          }
+        );
+
+        reveals.forEach((el) => obs.observe(el));
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

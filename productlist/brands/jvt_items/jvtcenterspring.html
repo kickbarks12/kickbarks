@@ -10,13 +10,13 @@
     />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
-  <body>
+  <body class="reveal">
     <nav
       class="navbar navbar-expand-lg fixed-top bg-dark"
       style="font-weight: bold"
     >
       <div class="container-fluid">
-        <a class="navbar-brand text-white" href="../Index.html">Kickbarks</a>
+        <a class="navbar-brand text-white" href="../../../Index.html">Kickbarks</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -34,24 +34,37 @@
               <a
                 class="nav-link active text-white"
                 aria-current="page"
-                href="../Index.html"
+                href="../../../Index.html"
                 >Home</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="../products.html"
+              <a class="nav-link text-white" href="../../../products.html"
                 >Products</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="../aboutus.html">About Us</a>
+              <a class="nav-link text-white" href="../../../aboutus.html">About Us</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="../contactus.html"
+              <a class="nav-link text-white" href="../../../contactus.html"
                 >Contact Us</a
               >
             </li>
           </ul>
+          <a href="./cart.html" class="text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2 1a1 1 0 0 0-1 1v1h14V2a1 1 0 0 0-1-1H2zM1 5h14l-1.5 9h-11L1 5zm4 2v5h1V7H5zm3 0v5h1V7H8zm3 0v5h1V7h-1z"
+              />
+            </svg>
+          </a>
 
           <form class="d-flex" role="search">
             <input
@@ -69,14 +82,14 @@
     </nav>
 
      <section 
-     style="background-image: url(../image/Motorcycle.png); margin-top: 50px;
+     style="background-image: url(../../../image/Motorcycle.png); margin-top: 50px;
       padding-bottom: 100px; padding-top: 10px;">
         <div class="container">
             <div class="row">
                 <div class="col">
                     <div class="card h-100">
           <img class="container d-flex justify-content-center align-items-center"
-            src="../image/jvtcenterspring.png"
+            src="../../../image/jvtcenterspring.png"
             class="card-img-top"
             alt="Product 1"
             style="width: 400px; height: auto"
@@ -144,6 +157,30 @@
           </div>
          </div>
      </section>
+     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reveals = document.querySelectorAll(".reveal");
+
+        const obs = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                // If you want it to animate only once, unobserve it:
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "0px 0px -10% 0px", // start a bit before element fully in view
+            threshold: 0,
+          }
+        );
+
+        reveals.forEach((el) => obs.observe(el));
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
