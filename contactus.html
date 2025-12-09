@@ -59,6 +59,9 @@
             </svg>
           </a>
         </div>
+        <button id="logoutBtn" class="btn-logout">
+  Logout
+</button>
       </div>
     </nav>
     <section
@@ -246,5 +249,39 @@
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reveals = document.querySelectorAll(".reveal");
+
+        const obs = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                // If you want it to animate only once, unobserve it:
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "0px 0px -10% 0px", // start a bit before element fully in view
+            threshold: 0,
+          }
+        );
+
+        reveals.forEach((el) => obs.observe(el));
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.getElementById("logoutBtn").addEventListener("click", function() {
+  localStorage.setItem("loggedIn", "false");
+  localStorage.removeItem("currentUser"); 
+  alert("You have been logged out!");
+  window.location.href = "login.html";  
+});
+</script>
   </body>
 </html>

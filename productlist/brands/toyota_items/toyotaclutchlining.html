@@ -56,7 +56,7 @@
               >
             </li>
           </ul>
-          <a href="./cart.html" class="text-white">
+          <a href="../../../cart.html" class="text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="26"
@@ -98,7 +98,7 @@
             <div class="card h-100">
               <img
                 class="container d-flex justify-content-center align-items-center"
-                src="../../../image/toyotabell.png"
+                src="../../../image/toyotaclutchlining.png"
                 class="card-img-top"
                 alt="Product 1"
                 style="width: 400px"
@@ -163,5 +163,40 @@
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const addToCartBtn = document.getElementById("addToCartBtn");
+
+        // Product info
+        const product = {
+          name: "CWORKS TOYOTA TSUSHO CLUTCH LINING",
+          price: 1200,
+        };
+
+        addToCartBtn.addEventListener("click", () => {
+          // Get cart from localStorage or empty array
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+          // Check if item already exists in cart
+          const existingIndex = cart.findIndex(
+            (item) => item.name === product.name
+          );
+          if (existingIndex !== -1) {
+            // Increase quantity if already exists
+            cart[existingIndex].quantity =
+              (cart[existingIndex].quantity || 1) + 1;
+          } else {
+            // Add new product with quantity 1
+            cart.push({ ...product, quantity: 1 });
+          }
+
+          // Save cart back to localStorage
+          localStorage.setItem("cart", JSON.stringify(cart));
+
+          alert("Product added to cart!");
+        });
+      });
+    </script>
+    
   </body>
 </html>
