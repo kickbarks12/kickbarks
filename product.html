@@ -116,95 +116,11 @@
     </nav>
 
     <!-- Home Section (Hero + Brands Carousel) -->
-    <section id="home" class="py-5 bg-primary">
-      <div class="container text-center">
-        <h1 class="display-5 mb-4">Welcome to Kickbarks Motoshop</h1>
-        <p class="lead mb-4">High-quality products for all your needs</p>
-
-        <!-- Brands Carousel -->
-        <div id="brandCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner text-center">
-            <div class="carousel-item active">
-              <img
-                src="./image/jvtcenterspring.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 1"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/jvtpulley.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 2"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/rcbbrakelever.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/rcbshock.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/rs8cvtcleaner.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/rs8ecoscooter.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/cworksclutchlining.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="./image/cworksbell.png"
-                class="d-inline-block shadow-lg p-3 bg-white rounded"
-                alt="Brand 3"
-              />
-            </div>
-          </div>
-          <button
-            class="carousel-control-prev"
-            type="button"
-            data-bs-target="#brandCarousel"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon"></span>
-          </button>
-          <button
-            class="carousel-control-next"
-            type="button"
-            data-bs-target="#brandCarousel"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon"></span>
-          </button>
-        </div>
-      </div>
-    </section>
 
     <!-- Products Section -->
     <section id="products" class="py-5 bg-light">
       <div class="container">
-        <h2 class="text-center mb-4">Brands</h2>
+        <h2 class="text-center mb-4">Our Products</h2>
 
         <!-- Search Bar -->
         <div class="mb-4 text-center">
@@ -221,52 +137,299 @@
           <div class="col-md-3 mb-4">
             <div class="card h-100 shadow-sm">
               <img
-                src="./image/cworkslogo.png"
+                src="./image/cworksbell.png"
                 class="card-img-top"
                 alt="Product 1"
               />
               <div class="card-body text-center">
-                <a href="" class="btn btn-primary"> View Product </a>
+                <h5 class="card-title">
+                  CWORKS TOYOTA TSUSHO CLUTCH BELL WITH GROOVE
+                </h5>
+                <p class="card-text">₱1,199</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
+
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
               </div>
             </div>
           </div>
           <div class="col-md-3 mb-4">
             <div class="card h-100 shadow-sm">
               <img
-                src="./image/jvtlogo(1).png"
+                src="./image/cworksclutchlining.png"
                 class="card-img-top"
                 alt="Product 2"
               />
               <div class="card-body text-center">
-                <a href="" class="btn btn-primary"> View Product </a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm">
-              <img src="./image/rcb.png" class="card-img-top" alt="Product 2" />
-              <div class="card-body text-center">
-                <a href="" class="btn btn-primary"> View Product </a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm">
-              <img src="./image/rs8.png" class="card-img-top" alt="Product 2" />
-              <div class="card-body text-center">
-                <a href="" class="btn btn-primary"> View Product </a>
-              </div>
-            </div>
-          </div>
+                <h5 class="card-title">CWORKS TOYOTA TSUSHO CLUTCH LINING</h5>
+                <p class="card-text">₱1,499</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
 
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/jvtcenterspring.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">JVT CENTER SPRING FOR NMAX/AEROX</h5>
+                <p class="card-text">₱499</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
+
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/jvtpulley.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  JVT PULLEY SET FOR NMAX 155, AEROX 155 V1/V2
+                </h5>
+                <p class="card-text">₱2,299</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
+
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/rcbbrakelever.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  RCB E2 BRAKE LEVER FOR BEAT F.I, CLICK 125/150 V1,V2, SNIPER
+                  150,NMAX V1,V2
+                </h5>
+                <p class="card-text">₱999</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
+
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/rcbshock.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  RACING BOY (RCB) SHOCK A2 Series 295mm/330mm (ALL TYPE )CLICK,
+                  MIO, SKDRIVE, BEAT
+                </h5>
+                <p class="card-text">₱1,399</p>
+                <!-- Motorcycle Select -->
+                <select class="form-select mb-2 motorcycle-select">
+                  <option value="">-- Select Motorcycle --</option>
+                  <option value="NMAX">Yamaha NMAX</option>
+                  <option value="Aerox">Yamaha Aerox</option>
+                  <option value="Click125">Honda Click 125</option>
+                </select>
+
+                <!-- Error Message (Hidden) -->
+                <small class="text-danger d-none select-warning">
+                  Please choose a motorcycle
+                </small>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/rs8cvtcleaner.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  RS8 CVT CLEANER SPRAY DEGREASER 450ML ORIGINAL
+                </h5>
+                <p class="card-text">₱119</p>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/rs8ecoscooter.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">
+                  RS8 ECO SCOOTER 10W-40 API SL SYNTHETIC MOTORCYCLE ENGINE OIL
+                </h5>
+                <p class="card-text">₱249</p>
+                <input
+                  type="number"
+                  class="form-control mb-2 product-qty"
+                  min="1"
+                  value="1"
+                />
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img
+                src="./image/Kupal.png"
+                class="card-img-top"
+                alt="Product 2"
+              />
+              <div class="card-body text-center">
+                <h5 class="card-title">Product 2</h5>
+                <p class="card-text">$75</p>
+                <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
           <!-- Add more products here -->
         </div>
-
-        <!-- Cart / Checkout Button -->
       </div>
     </section>
 
     <!-- Cart Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your Cart</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="cartItems">
+            <p>Your cart is empty.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" id="checkoutBtn">
+              Checkout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 
     <!-- About Us Section -->
 
@@ -308,16 +471,6 @@
                   id="loginPassword"
                   required
                 />
-              </div>
-              <div class="form-check mb-3">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="rememberMe"
-                />
-                <label class="form-check-label" for="rememberMe">
-                  Remember Me
-                </label>
               </div>
               <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>
@@ -377,6 +530,7 @@
     </div>
 
     <!-- Bootstrap JS -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./src/function.js"></script>
     <script>

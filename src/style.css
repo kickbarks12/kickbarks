@@ -1,79 +1,87 @@
-* {
-  border: 0 !important;
-}
-html {
+body {
   scroll-behavior: smooth;
 }
-section {
-  padding: 100px 0;
-  min-height: 100vh;
-}
-#home {
-  background-color: black;
-}
-#products {
-  background-color: black;
-}
-#about-us {
-  background-color: black;
-}
-#contact-us {
-  background-color: black;
-}
-.title-header {
-  background-color: #9BC1BC;
-  padding: 10px;
-  border-radius: 50px;
-  margin: 10 auto;
-  list-style-position: inside;
-}
-.navbar-brand,
-.nav-link {
-  color: white !important;
-}
-/* initial (hidden) state */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
-  will-change: opacity, transform;
+
+#home img {
+  max-height: 150px;
 }
 
-/* visible state (when scrolled into view) */
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+#productList .card img {
+  max-height: 200px;
+  object-fit: contain;
 }
 
-.shadow-hover:hover {
-  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .25) !important;
-  /* transform: scale(1.05) !important; */
-  transition: 0.3s ease !important;
+.map-responsive {
+  overflow: hidden;
+  padding-bottom: 20%; /* 16:9 Aspect Ratio */
+  position: relative;
+  width: 100%;   /* full width of parent */
+  max-width: 1000px; /* optional: max width */
+  margin: 0 auto;    /* center on page */
+  height: 0;
+}
+
+.map-responsive iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;    /* smaller width */
+  height: 100%;   /* smaller height */
+  border: 0;
+  transform: translate(-50%, -50%); /* center it */
 }
 
 
-.btn-logout {
-  background-color: #ff4d4d;       /* Red background */
-  color: white;                     /* White text */
-  border: none;                     /* Remove default border */
-  padding: 10px 20px;               /* Padding */
-  font-size: 16px;                  /* Font size */
-  border-radius: 8px;               /* Rounded corners */
-  cursor: pointer;                  /* Pointer on hover */
-  transition: background-color 0.3s, transform 0.2s; /* Smooth effect */
+
+
+body {
+  scroll-behavior: smooth;
 }
 
-.btn-logout:hover {
-  background-color: #e60000;        /* Darker red on hover */
-  transform: scale(1.05);           /* Slight zoom effect */
+#home img {
+  max-height: 150px;
 }
 
-#search-bar {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+#productList .card img {
+  max-height: 200px;
+  object-fit: contain;
 }
 
+body {
+  scroll-behavior: smooth;
+}
+
+#home img {
+  max-height: 150px;
+}
+
+#productList .card img {
+  max-height: 200px;
+  object-fit: contain;
+}
+
+#home, #products, #contact-us, #about-us {
+  /* Background image */
+  background-image: url('../image/Motorcycle.png'); /* replace with your image path */
+  background-size: cover;      /* makes it cover entire section */
+  background-position: center; /* centers the image */
+  background-repeat: no-repeat;
+  min-height: 100vh;           /* makes the section full viewport height */
+  color: black;                /* ensures text is visible */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+#brandCarousel .carousel-inner img {
+  max-width: 90%;      /* enlarge images (90% of carousel width) */
+  max-height: 400px;   /* adjust height as needed */
+  object-fit: contain;  /* preserves image aspect ratio */
+  margin: auto;         /* centers the image */
+}
+
+.card-img-top {
+  height: 200px;       /* set uniform height */
+  object-fit: contain; /* keeps image ratio */
+}
