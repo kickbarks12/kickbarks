@@ -13,75 +13,37 @@ body {
 
 .map-responsive {
   overflow: hidden;
-  padding-bottom: 20%; /* 16:9 Aspect Ratio */
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
   position: relative;
-  width: 100%;   /* full width of parent */
-  max-width: 1000px; /* optional: max width */
-  margin: 0 auto;    /* center on page */
   height: 0;
 }
 
 .map-responsive iframe {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;    /* smaller width */
-  height: 100%;   /* smaller height */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
-  transform: translate(-50%, -50%); /* center it */
-}
-
-
-
-
-body {
-  scroll-behavior: smooth;
-}
-
-#home img {
-  max-height: 150px;
-}
-
-#productList .card img {
-  max-height: 200px;
-  object-fit: contain;
-}
-
-body {
-  scroll-behavior: smooth;
-}
-
-#home img {
-  max-height: 150px;
-}
-
-#productList .card img {
-  max-height: 200px;
-  object-fit: contain;
-}
-
-#home, #products, #contact-us, #about-us {
-  /* Background image */
-  background-image: url('../image/Motorcycle.png'); /* replace with your image path */
-  background-size: cover;      /* makes it cover entire section */
-  background-position: center; /* centers the image */
-  background-repeat: no-repeat;
-  min-height: 100vh;           /* makes the section full viewport height */
-  color: black;                /* ensures text is visible */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-#brandCarousel .carousel-inner img {
-  max-width: 90%;      /* enlarge images (90% of carousel width) */
-  max-height: 400px;   /* adjust height as needed */
-  object-fit: contain;  /* preserves image aspect ratio */
-  margin: auto;         /* centers the image */
 }
 
 .card-img-top {
-  height: 200px;       /* set uniform height */
-  object-fit: contain; /* keeps image ratio */
+  height: 200px;
+  object-fit: contain;
 }
+
+#brandCarousel .carousel-inner img {
+  max-width: 90%;
+  max-height: 400px;
+  object-fit: contain;
+  margin: auto;
+}
+.brand-card img {
+  transition: all 0.3s ease;
+  border: 3px solid #fff;
+}
+.brand-card:hover img {
+  transform: scale(1.15);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+

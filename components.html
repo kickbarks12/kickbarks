@@ -1,193 +1,250 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kickbarks Store</title>
-
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="./src/style.css" />
-  </head>
-  <body>
-    <!-- components.html -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-      <div class="container">
-        <a class="navbar-brand fw-bold" href="index.html">Kickbarks</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto me-3">
-            <li class="nav-item">
-              <a class="nav-link" href="index.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="product.html">Products</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="aboutus.html">About Us</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="contactus.html">Contact Us</a>
-            </li>
-          </ul>
-
-          <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle btn btn-outline-light"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                id="accountDropdown"
-              >
-                Account
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loginModal"
-                    id="loginItem"
-                    >Login</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#signupModal"
-                    id="signupItem"
-                    >Sign Up</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a
-                    class="dropdown-item text-danger"
-                    href="#"
-                    id="logoutBtn"
-                    style="display: none"
-                    >Log Out</a
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
-
-          <button
-            class="btn btn-success ms-2"
-            id="cartBtn"
-            style="display: none"
-            data-bs-toggle="modal"
-            data-bs-target="#cartModal"
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Kickbarks</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto me-3">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="product.html">Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="aboutus.html">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="contactus.html">Contact Us</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle btn btn-outline-light"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            id="accountDropdown"
+            >Account</a
           >
-            View Cart (<span id="cartCount">0</span>)
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#loginModal"
+                id="loginItem"
+                >Login</a
+              >
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#signupModal"
+                id="signupItem"
+                >Sign Up</a
+              >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a
+                class="dropdown-item text-danger"
+                href="#"
+                id="logoutBtn"
+                style="display: none"
+                >Log Out</a
+              >
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <button
+        class="btn btn-success ms-2"
+        id="cartBtn"
+        style="display: none"
+        data-bs-toggle="modal"
+        data-bs-target="#cartModal"
+      >
+        View Cart (<span id="cartCount">0</span>)
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- CART MODAL -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Your Cart</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body" id="cartItems">
+        <p class="text-muted">Your cart is empty.</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <div>
+          <strong>Total: ₱<span id="cartTotal">0</span></strong>
+        </div>
+        <div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" id="checkoutBtn">
+            Checkout
           </button>
         </div>
       </div>
-    </nav>
+    </div>
+  </div>
+</div>
 
-    <!-- Cart Modal -->
-    <div class="modal fade" id="cartModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Your Cart</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
+<!-- PAYMENT METHOD MODAL -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Choose Payment Method</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p class="lead mb-4">How would you like to pay?</p>
+        <div class="row g-3">
+          <div class="col-12">
+            <button type="button" class="btn btn-outline-success btn-lg w-100 py-4" id="codBtn">
+              Cash on Delivery (COD)
+            </button>
           </div>
-          <div class="modal-body" id="cartItems">
-            <p class="text-muted">Your cart is empty.</p>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <div>
-              <strong>Total: ₱<span id="cartTotal">0</span></strong>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <button type="button" class="btn btn-primary" id="checkoutBtn">
-                Checkout
-              </button>
-            </div>
+          <div class="col-12">
+            <button type="button" class="btn btn-outline-primary btn-lg w-100 py-4" id="onlineBtn">
+              Online Payment<br>
+              <small class="text-muted">GCash • Maya • Card • ShopeePay</small>
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Login Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Login</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
+<!-- SUCCESS MODAL -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center py-5">
+      <div class="mb-4">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+      </div>
+      <h3>Order Placed Successfully!</h3>
+      <p class="lead" id="paymentSummary"></p>
+      <p class="text-muted">We will contact you soon for delivery details.</p>
+      <button type="button" class="btn btn-success px-5" data-bs-dismiss="modal">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL SENT MODAL -->
+<div class="modal fade" id="emailSentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center py-5">
+      <div class="mb-4">
+        <i class="bi bi-envelope-check-fill text-success" style="font-size: 4rem;"></i>
+      </div>
+      <h3>Email Sent!</h3>
+      <p class="lead">Your order confirmation has been sent to your email.</p>
+      <p class="text-muted">Check your inbox (and spam folder) for the details.</p>
+      <button type="button" class="btn btn-success px-5" data-bs-dismiss="modal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Login</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label">Username</label
+            ><input
+              type="text"
+              id="loginUsername"
+              class="form-control"
+              required
+            />
           </div>
-          <div class="modal-body">
-            <form id="loginForm">
-              <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input
-                  type="text"
-                  id="loginUsername"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input
-                  type="password"
-                  id="loginPassword"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-check mb-3">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="rememberMe"
-                />
-                <label class="form-check-label" for="rememberMe">
-                  Remember me
-                </label>
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
+          <div class="mb-3">
+            <label class="form-label">Password</label
+            ><input
+              type="password"
+              id="loginPassword"
+              class="form-control"
+              required
+            />
           </div>
-        </div>
+          <div class="form-check mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="rememberMe"
+            /><label class="form-check-label" for="rememberMe"
+              >Remember me</label
+            >
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Bootstrap + Main JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./src/function.js"></script>
-  </body>
-</html>
+<!-- SIGNUP MODAL -->
+<div class="modal fade" id="signupModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sign Up</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center text-muted">Sign up feature coming soon!</p>
+        <button
+          type="button"
+          class="btn btn-primary w-100"
+          data-bs-dismiss="modal"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
