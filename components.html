@@ -22,6 +22,9 @@
         <li class="nav-item">
           <a class="nav-link" href="contactus.html">Contact Us</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="orders.html">Order History</a>
+        </li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
@@ -80,6 +83,22 @@
   </div>
 </nav>
 
+<!-- PROMO BANNER -->
+<div id="promoBanner">
+  🎉 FREE Shipping on orders over ₱5,000! Limited time only! 🎉
+  <button class="close-btn" id="closePromo">&times;</button>
+</div>
+
+<!-- BACK TO TOP BUTTON -->
+<button id="backToTop" title="Back to Top">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
+<!-- MESSENGER BUTTON -->
+<div class="messenger-btn" title="Chat with us">
+  <i class="bi bi-messenger" style="font-size: 2rem; color: white"></i>
+</div>
+
 <!-- CART MODAL -->
 <div class="modal fade" id="cartModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -116,29 +135,129 @@
   </div>
 </div>
 
-<!-- PAYMENT METHOD MODAL -->
-<div class="modal fade" id="paymentModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- PAYMENT DETAILS MODAL -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Choose Payment Method</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Complete Your Order</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
       </div>
-      <div class="modal-body text-center py-4">
-        <p class="lead mb-4">How would you like to pay?</p>
-        <div class="row g-3">
-          <div class="col-12">
-            <button type="button" class="btn btn-outline-success btn-lg w-100 py-4" id="codBtn">
-              Cash on Delivery (COD)
-            </button>
+      <div class="modal-body">
+        <form id="paymentDetailsForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name *</label>
+              <input type="text" class="form-control" id="payerName" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email *</label>
+              <input
+                type="email"
+                class="form-control"
+                id="payerEmail"
+                required
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Delivery Address *</label>
+              <textarea
+                class="form-control"
+                id="payerAddress"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Birthday * (MM/DD/YYYY)</label>
+              <input
+                type="text"
+                class="form-control"
+                id="payerBirthday"
+                placeholder="e.g. 01/01/2000"
+                pattern="(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(19|20)\d\d"
+                title="Please enter date as MM/DD/YYYY (e.g. 01/01/2000)"
+                required
+              />
+              <small class="text-muted">Format: MM/DD/YYYY</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Age *</label>
+              <input
+                type="number"
+                class="form-control"
+                id="payerAge"
+                min="18"
+                required
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Payment Method *</label>
+              <select class="form-select" id="paymentMethod" required>
+                <option value="">-- Choose Payment Method --</option>
+                <option value="QRPH" data-qr="./image/QR.png">
+                  QRPH (Scan to Pay)
+                </option>
+                <option value="GCash">GCash</option>
+                <option value="Maya">Maya</option>
+                <option value="ShopeePay">ShopeePay</option>
+                <option value="BDO">BDO Online Banking</option>
+                <option value="BPI">BPI Online Banking</option>
+                <option value="Metrobank">Metrobank Online Banking</option>
+                <option value="COD">Cash on Delivery (COD)</option>
+              </select>
+
+              <!-- QR Code Container -->
+              <div id="qrCodeContainer" class="text-center mt-4 d-none">
+                <p class="fw-bold mb-3">Scan to Pay with QRPH</p>
+                <img
+                  id="qrCodeImage"
+                  src=""
+                  alt="QRPH Code"
+                  class="img-fluid border rounded shadow"
+                  style="max-width: 300px"
+                />
+                <p class="text-muted small mt-3">
+                  After payment, upload your receipt below to complete the
+                  order.
+                </p>
+
+                <!-- Receipt Upload -->
+                <div class="mt-4">
+                  <label for="receiptUpload" class="form-label fw-bold"
+                    >Upload Receipt *</label
+                  >
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="receiptUpload"
+                    accept="image/*"
+                    required
+                  />
+                  <small class="text-muted"
+                    >Take a screenshot or photo of your payment receipt.</small
+                  >
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-12">
-            <button type="button" class="btn btn-outline-primary btn-lg w-100 py-4" id="onlineBtn">
-              Online Payment<br>
-              <small class="text-muted">GCash • Maya • Card • ShopeePay</small>
+          <div class="mt-4 text-center">
+            <button
+              type="submit"
+              class="btn btn-success btn-lg px-5"
+              id="submitOrderBtn"
+            >
+              Submit Order
             </button>
+            <p class="text-muted small mt-2" id="receiptRequired">
+              Please upload your payment receipt to continue.
+            </p>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>
@@ -149,12 +268,21 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-center py-5">
       <div class="mb-4">
-        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        <i
+          class="bi bi-check-circle-fill text-success"
+          style="font-size: 4rem"
+        ></i>
       </div>
       <h3>Order Placed Successfully!</h3>
       <p class="lead" id="paymentSummary"></p>
       <p class="text-muted">We will contact you soon for delivery details.</p>
-      <button type="button" class="btn btn-success px-5" data-bs-dismiss="modal">Done</button>
+      <button
+        type="button"
+        class="btn btn-success px-5"
+        data-bs-dismiss="modal"
+      >
+        Done
+      </button>
     </div>
   </div>
 </div>
@@ -164,12 +292,23 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-center py-5">
       <div class="mb-4">
-        <i class="bi bi-envelope-check-fill text-success" style="font-size: 4rem;"></i>
+        <i
+          class="bi bi-envelope-check-fill text-success"
+          style="font-size: 4rem"
+        ></i>
       </div>
       <h3>Email Sent!</h3>
       <p class="lead">Your order confirmation has been sent to your email.</p>
-      <p class="text-muted">Check your inbox (and spam folder) for the details.</p>
-      <button type="button" class="btn btn-success px-5" data-bs-dismiss="modal">OK</button>
+      <p class="text-muted">
+        Check your inbox (and spam folder) for the details.
+      </p>
+      <button
+        type="button"
+        class="btn btn-success px-5"
+        data-bs-dismiss="modal"
+      >
+        OK
+      </button>
     </div>
   </div>
 </div>
@@ -248,3 +387,41 @@
   </div>
 </div>
 
+<!-- WELCOME MODAL -->
+<div class="modal fade" id="welcomeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content text-center">
+      <div class="modal-header border-0 pb-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body py-5">
+        <i class="bi bi-shop text-primary" style="font-size: 4rem"></i>
+        <h2 class="mt-4 fw-bold">Welcome to Kickbarks Motoshop!</h2>
+        <p class="lead text-muted mt-3">
+          Your trusted source for premium motorcycle parts & accessories in the
+          Philippines.
+        </p>
+        <p class="fs-4">“Ride hard, ride safe, ride with style.”</p>
+        <div class="mt-4">
+          <button
+            type="button"
+            class="btn btn-primary btn-lg px-5"
+            data-bs-dismiss="modal"
+          >
+            Start Shopping
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pb-4">
+        <small class="text-muted">
+          <input type="checkbox" id="dontShowAgain" class="me-2" />
+          <label for="dontShowAgain">Don't show this again</label>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,14 +5,14 @@ let currentUser = localStorage.getItem('currentUser') || null;
 const users = { admin: '12345', chester: 'kickbarks', test: '123456' };
 
 const products = [
-  { id: 1, name: 'CWORKS TOYOTA TSUSHO CLUTCH BELL WITH GROOVE', price: 1199, brand: 'CWORKS', img: './image/cworksbell.png', motorcycles: ['NMAX', 'Aerox', 'Click125'] },
-  { id: 2, name: 'CWORKS TOYOTA TSUSHO CLUTCH LINING', price: 1499, brand: 'CWORKS', img: './image/cworksclutchlining.png', motorcycles: ['NMAX', 'Aerox', 'Click125'] },
-  { id: 3, name: 'JVT CENTER SPRING FOR NMAX/AEROX', price: 499, brand: 'JVT', img: './image/jvtcenterspring.png', motorcycles: ['NMAX', 'Aerox'] },
-  { id: 4, name: 'JVT PULLEY SET FOR NMAX 155, AEROX 155 V1/V2', price: 2299, brand: 'JVT', img: './image/jvtpulley.png', motorcycles: ['NMAX', 'Aerox'] },
-  { id: 5, name: 'RCB E2 BRAKE LEVER FOR BEAT F.I, CLICK 125/150 V1,V2, SNIPER 150,NMAX V1,V2', price: 999, brand: 'Racing Boy', img: './image/rcbbrakelever.png', motorcycles: ['NMAX', 'Aerox', 'Click125'] },
-  { id: 6, name: 'RACING BOY (RCB) SHOCK A2 Series 295mm/330mm', price: 1399, brand: 'Racing Boy', img: './image/rcbshock.png', motorcycles: ['Click125', 'Beat'] },
-  { id: 7, name: 'RS8 CVT CLEANER SPRAY DEGREASER 450ML ORIGINAL', price: 119, brand: 'RS8', img: './image/rs8cvtcleaner.png', motorcycles: [] },
-  { id: 8, name: 'RS8 ECO SCOOTER 10W-40 API SL SYNTHETIC MOTORCYCLE ENGINE OIL', price: 249, brand: 'RS8', img: './image/rs8ecoscooter.png', motorcycles: [] },
+  { id: 1, name: 'CWORKS TOYOTA TSUSHO CLUTCH BELL WITH GROOVE', price: 1199, brand: 'CWORKS', img: './image/cworksbell.png', motorcycles: ['NMAX', 'Aerox', 'Click125'], category: 'Clutch', badge: 'hot' },
+  { id: 2, name: 'CWORKS TOYOTA TSUSHO CLUTCH LINING', price: 1499, brand: 'CWORKS', img: './image/cworksclutchlining.png', motorcycles: ['NMAX', 'Aerox', 'Click125'], category: 'Clutch', badge: 'hot' },
+  { id: 3, name: 'JVT CENTER SPRING FOR NMAX/AEROX', price: 499, brand: 'JVT', img: './image/jvtcenterspring.png', motorcycles: ['NMAX', 'Aerox'], category: 'Suspension', badge: 'new' },
+  { id: 4, name: 'JVT PULLEY SET FOR NMAX 155, AEROX 155 V1/V2', price: 2299, brand: 'JVT', img: './image/jvtpulley.png', motorcycles: ['NMAX', 'Aerox'], category: 'Suspension' },
+  { id: 5, name: 'RCB E2 BRAKE LEVER FOR BEAT F.I, CLICK 125/150 V1,V2, SNIPER 150,NMAX V1,V2', price: 999, brand: 'Racing Boy', img: './image/rcbbrakelever.png', motorcycles: ['NMAX', 'Aerox', 'Click125'], category: 'Brakes' },
+  { id: 6, name: 'RACING BOY (RCB) SHOCK A2 Series 295mm/330mm', price: 1399, brand: 'Racing Boy', img: './image/rcbshock.png', motorcycles: ['Click125', 'Beat'], category: 'Suspension' },
+  { id: 7, name: 'RS8 CVT CLEANER SPRAY DEGREASER 450ML ORIGINAL', price: 119, brand: 'RS8', img: './image/rs8cvtcleaner.png', motorcycles: [], category: 'Oil', badge: 'sale' },
+  { id: 8, name: 'RS8 ECO SCOOTER 10W-40 API SL SYNTHETIC MOTORCYCLE ENGINE OIL', price: 249, brand: 'RS8', img: './image/rs8ecoscooter.png', motorcycles: [], category: 'Oil', badge: 'sale' },
 ];
 
 const brands = [...new Set(products.map(p => p.brand))].sort();
@@ -22,34 +22,18 @@ let brandContainer = null, productContainer = null, searchInput = null, clearFil
 function renderBrands() {
   if (!brandContainer) return;
   brandContainer.innerHTML = '';
-
-  const brandLogos = {
-    'CWORKS': 'cworkslogo.png',
-    'JVT': 'jvtlogo.png',
-    'Racing Boy': 'rcb.png',   // note the space → we handle it
-    'RS8': 'rs8.png'
-  };
-
+  const brandLogos = { 'CWORKS': 'cworkslogo.png', 'JVT': 'jvtlogo.png', 'Racing Boy': 'rcb.png', 'RS8': 'rs8.png' };
   brands.forEach(brand => {
     const col = document.createElement('div');
     col.className = 'col text-center brand-card';
-
-    // Use real logo if exists, fallback to placeholder
     const logoFile = brandLogos[brand] || `${brand.toLowerCase().replace(/\s+/g, '-')}.png`;
     const imgSrc = `./image/brands/${logoFile}`;
-
     col.innerHTML = `
       <a href="#" class="text-decoration-none d-block" data-brand="${brand}">
-        <img 
-          src="${imgSrc}" 
-          onerror="this.src='https://via.placeholder.com/150/333333/FFFFFF?text=${brand}'"
-          class="img-fluid rounded mb-3 shadow-sm" 
-          alt="${brand}" 
-          style="width:140px; height:140px; object-fit:contain; background:#fff; padding:10px; border-radius:12px;">
+        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/333333/FFFFFF?text=${brand}'" class="img-fluid rounded mb-3 shadow-sm" alt="${brand}" style="width:140px; height:140px; object-fit:contain; background:#fff; padding:10px; border-radius:12px;">
         <h6 class="fw-bold text-dark mt-2">${brand}</h6>
       </a>
     `;
-
     brandContainer.appendChild(col);
   });
 }
@@ -57,11 +41,23 @@ function renderBrands() {
 function renderProducts(filtered = products) {
   if (!productContainer) return;
   productContainer.innerHTML = '';
+  if (filtered.length === 0) {
+    productContainer.innerHTML = '<p class="text-center text-muted col-12">No products found.</p>';
+    return;
+  }
   filtered.forEach(p => {
     const col = document.createElement('div');
     col.className = 'col-md-3 mb-4 product-card';
+    col.setAttribute('data-category', p.category || 'all');
+
+    let badge = '';
+    if (p.badge === 'new') badge = '<span class="product-badge new">NEW</span>';
+    if (p.badge === 'hot') badge = '<span class="product-badge hot">HOT</span>';
+    if (p.badge === 'sale') badge = '<span class="product-badge sale">SALE</span>';
+
     col.innerHTML = `
-      <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm position-relative">
+        ${badge}
         <img src="${p.img}" class="card-img-top" alt="${p.name}" style="height:200px;object-fit:cover;">
         <div class="card-body text-center">
           <h5 class="card-title">${p.name}</h5>
@@ -236,82 +232,104 @@ document.addEventListener('click', e => {
       updateUI();
       alert('Logged out. Your cart is saved!');
     }
-  
-  }
-  document.addEventListener('click', e => {
-  // Logout
-  if (e.target.id === 'logoutBtn') {
-    if (confirm('Log out?')) {
-      isLoggedIn = false;
-      currentUser = null;
-      localStorage.setItem('isLoggedIn', 'false');
-      localStorage.removeItem('currentUser');
-      updateUI();
-      alert('Logged out. Your cart is saved!');
-    }
   }
 
-  // Checkout - Open Payment Choice
   if (e.target.id === 'checkoutBtn') {
     if (cart.length === 0) return alert('Cart is empty!');
-
-    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show();
-
-    // Prevent multiple listeners
-    const codBtn = document.getElementById('codBtn');
-    const onlineBtn = document.getElementById('onlineBtn');
-    codBtn.onclick = null;
-    onlineBtn.onclick = null;
-
-    codBtn.onclick = () => processOrder('Cash on Delivery (COD)', paymentModal);
-    onlineBtn.onclick = () => processOrder('Online Payment (GCash, Maya, Card, etc.)', paymentModal);
+    bootstrap.Modal.getInstance(document.getElementById('cartModal'))?.hide();
+    new bootstrap.Modal(document.getElementById('paymentDetailsModal')).show();
   }
 });
 
-function processOrder(paymentMethod, paymentModal) {
-  let total = 0;
-  let orderDetails = `ORDER CONFIRMATION - Kickbarks Motoshop\n\n`;
-  orderDetails += `Date: ${new Date().toLocaleDateString('en-PH')}\n`;
-  orderDetails += `Customer: ${currentUser}\n\n`;
-  orderDetails += `ITEMS:\n`;
+document.addEventListener('submit', e => {
+  if (e.target.id === 'paymentDetailsForm') {
+    e.preventDefault();
 
-  cart.forEach(item => {
-    orderDetails += `• ${item.name}\n`;
-    if (item.motorcycle && item.motorcycle !== 'Universal') orderDetails += `  → ${item.motorcycle}\n`;
-    orderDetails += `  × ${item.qty} = ₱${(item.price * item.qty).toLocaleString()}\n\n`;
-    total += item.price * item.qty;
-  });
+    const name = document.getElementById('payerName').value.trim();
+    const email = document.getElementById('payerEmail').value.trim();
+    const address = document.getElementById('payerAddress').value.trim();
+    const birthday = document.getElementById('payerBirthday').value;
+    const age = document.getElementById('payerAge').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
 
-  orderDetails += `TOTAL AMOUNT: ₱${total.toLocaleString()}\n`;
-  orderDetails += `PAYMENT METHOD: ${paymentMethod}\n\n`;
-  orderDetails += `Thank you for your order! We will contact you soon for delivery.\n`;
-  orderDetails += `Kickbarks Motoshop Team`;
+    if (!name || !email || !address || !birthday || !age || !paymentMethod) {
+      alert('Please fill in all fields!');
+      return;
+    }
 
-  // Show success
-  document.getElementById('paymentSummary').textContent = 
-    `Total: ₱${total.toLocaleString()} • Payment: ${paymentMethod}`;
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-  successModal.show();
+    // === SEND REAL EMAIL ===
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+      to_name: name,
+      to_email: email,
+      total: '₱' + total.toLocaleString(),
+      payment_method: paymentMethod,
+      order_items: cart.map(item => `${item.name} × ${item.qty}`).join('\n'),
+      delivery_address: address
+    })
+    .then(() => {
+      console.log('Email sent successfully!');
+    })
+    .catch((err) => {
+      console.error('Email failed:', err);
+      // Still show success even if email fails (optional)
+    });
 
-  paymentModal.hide();
+    // Show success
+    document.getElementById('paymentSummary').textContent = 
+      `Total: ₱${total.toLocaleString()} • Payment: ${paymentMethod}`;
 
-  // Clear cart
-  cart = [];
-  localStorage.setItem('cart', '[]');
-  updateUI();
+    bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
+    new bootstrap.Modal(document.getElementById('successModal')).show();
 
-  // Show "Email Sent" after success modal closes
-  document.getElementById('successModal').addEventListener('hidden.bs.modal', function () {
-    const emailModal = new bootstrap.Modal(document.getElementById('emailSentModal'));
-    emailModal.show();
-  }, { once: true });
-}
+    cart = [];
+    localStorage.setItem('cart', '[]');
+    updateUI();
 
-document.addEventListener('shown.bs.modal', e => {
-  if (e.target.id === 'loginModal') loadSavedCredentials();
+    document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
+      new bootstrap.Modal(document.getElementById('emailSentModal')).show();
+    }, { once: true });
+  }
 });
 
+
+
+
+/// QRPH: Show QR + Receipt Upload + Control Submit Button
+document.getElementById('paymentMethod')?.addEventListener('change', function() {
+  const qrContainer = document.getElementById('qrCodeContainer');
+  const qrImage = document.getElementById('qrCodeImage');
+  const receiptUpload = document.getElementById('receiptUpload');
+  const submitBtn = document.getElementById('submitOrderBtn');
+  const receiptRequired = document.getElementById('receiptRequired');
+  const selectedOption = this.options[this.selectedIndex];
+
+  if (this.value === 'QRPH') {
+    const qrUrl = selectedOption.getAttribute('data-qr');
+    if (qrUrl) {
+      qrImage.src = qrUrl;
+      qrContainer.classList.remove('d-none');
+      receiptUpload.required = true;
+      submitBtn.disabled = true; // Disable until receipt uploaded
+      receiptRequired.classList.remove('d-none');
+    }
+  } else {
+    qrContainer.classList.add('d-none');
+    receiptUpload.required = false;
+    submitBtn.disabled = false; // Enable for other methods
+    receiptRequired.classList.add('d-none');
+  }
+});
+
+// Enable Submit Button when receipt is uploaded
+document.getElementById('receiptUpload')?.addEventListener('change', function() {
+  const submitBtn = document.getElementById('submitOrderBtn');
+  const receiptRequired = document.getElementById('receiptRequired');
+  if (this.files && this.files[0]) {
+    submitBtn.disabled = false;
+    receiptRequired.classList.add('d-none');
+  }
+});
 
 updateUI();
