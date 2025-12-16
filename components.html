@@ -199,18 +199,46 @@
               <label class="form-label">Payment Method *</label>
               <select class="form-select" id="paymentMethod" required>
                 <option value="">-- Choose Payment Method --</option>
-                <option value="QRPH" data-qr="./image/QR.png">
-                  QRPH (Scan to Pay)
+                <option value="QRPH" data-qr="./image/QR.png" data-type="qrph">
+                  QRPH (Scan to Pay - Any E-Wallet/Bank)
                 </option>
-                <option value="GCash">GCash</option>
-                <option value="Maya">Maya</option>
-                <option value="ShopeePay">ShopeePay</option>
-                <option value="BDO">BDO Online Banking</option>
-                <option value="BPI">BPI Online Banking</option>
-                <option value="Metrobank">Metrobank Online Banking</option>
+                <option
+                  value="GCash"
+                  data-qr="/image/gcash.png"
+                  data-type="qrph"
+                >
+                  GCash
+                </option>
+                <option value="Maya" data-qr="/image/maya.png" data-type="qrph">
+                  Maya
+                </option>
+                <option
+                  value="ShopeePay"
+                  data-qr="/image/shopeepay.png"
+                  data-type="qrph"
+                >
+                  ShopeePay
+                </option>
+                <option
+                  value="BDO"
+                  data-url="https://www.bdo.com.ph/personal/online-banking"
+                >
+                  BDO Online Banking
+                </option>
+                <option
+                  value="BPI"
+                  data-url="https://www.bpi.com.ph/personal/bank/online"
+                >
+                  BPI Online Banking
+                </option>
+                <option
+                  value="Metrobank"
+                  data-url="https://www.metrobank.com.ph/personal/online-banking"
+                >
+                  Metrobank Online Banking
+                </option>
                 <option value="COD">Cash on Delivery (COD)</option>
               </select>
-
               <!-- QR Code Container -->
               <div id="qrCodeContainer" class="text-center mt-4 d-none">
                 <p class="fw-bold mb-3">Scan to Pay with QRPH</p>

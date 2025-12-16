@@ -260,7 +260,7 @@ document.addEventListener('submit', e => {
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
     // === SEND REAL EMAIL ===
-    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+    emailjs.send('service_438wssi', 'template_j27m6cr', {
       to_name: name,
       to_email: email,
       total: '₱' + total.toLocaleString(),
@@ -296,40 +296,103 @@ document.addEventListener('submit', e => {
 
 
 
-/// QRPH: Show QR + Receipt Upload + Control Submit Button
-document.getElementById('paymentMethod')?.addEventListener('change', function() {
-  const qrContainer = document.getElementById('qrCodeContainer');
-  const qrImage = document.getElementById('qrCodeImage');
-  const receiptUpload = document.getElementById('receiptUpload');
-  const submitBtn = document.getElementById('submitOrderBtn');
-  const receiptRequired = document.getElementById('receiptRequired');
-  const selectedOption = this.options[this.selectedIndex];
 
-  if (this.value === 'QRPH') {
-    const qrUrl = selectedOption.getAttribute('data-qr');
-    if (qrUrl) {
-      qrImage.src = qrUrl;
-      qrContainer.classList.remove('d-none');
-      receiptUpload.required = true;
-      submitBtn.disabled = true; // Disable until receipt uploaded
-      receiptRequired.classList.remove('d-none');
+// === FINAL PAYMENT METHOD & QR + RECEIPT LOGIC (GUARANTEED TO WORK) ===
+document.addEventListener('DOMContentLoaded', () => {
+  const paymentMethodSelect = document.getElementById('paymentMethod');
+  const paymentModal = document.getElementById('paymentDetailsModal');
+
+  if (!paymentMethodSelect || !paymentModal) return;
+
+  // These will be grabbed fresh every time modal opens (safer)
+  let qrContainer, qrImage, receiptUpload, submitBtn, receiptRequired, instructionText;
+
+  const ewalletMethods = ['QRPH', 'GCash', 'Maya', 'ShopeePay'];
+
+  const resetPaymentExtras = () => {
+    if (qrContainer) qrContainer.classList.add('d-none');
+    if (qrImage) qrImage.src = '';
+    if (receiptUpload) {
+      receiptUpload.value = '';
+      receiptUpload.required = false;
     }
-  } else {
-    qrContainer.classList.add('d-none');
-    receiptUpload.required = false;
-    submitBtn.disabled = false; // Enable for other methods
-    receiptRequired.classList.add('d-none');
-  }
-});
+    if (submitBtn) submitBtn.disabled = false;
+    if (receiptRequired) receiptRequired.classList.add('d-none');
+    if (instructionText) instructionText.textContent = 'Scan to Pay with QRPH';
+  };
 
-// Enable Submit Button when receipt is uploaded
-document.getElementById('receiptUpload')?.addEventListener('change', function() {
-  const submitBtn = document.getElementById('submitOrderBtn');
-  const receiptRequired = document.getElementById('receiptRequired');
-  if (this.files && this.files[0]) {
-    submitBtn.disabled = false;
-    receiptRequired.classList.add('d-none');
-  }
-});
+  const showQRAndRequireReceipt = (qrSrc, methodName) => {
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0).toLocaleString('en-PH');
 
+    qrContainer.classList.remove('d-none');
+    qrImage.src = qrSrc || './image/QR.png';  // Strong fallback
+    instructionText.textContent = `Scan to pay ₱${total} using ${methodName}`;
+
+    receiptUpload.required = true;
+    submitBtn.disabled = true;
+    receiptRequired.classList.remove('d-none');
+  };
+
+  const handlePaymentChange = () => {
+    resetPaymentExtras();
+
+    const selectedValue = paymentMethodSelect.value;
+    const selectedOption = paymentMethodSelect.selectedOptions[0];
+
+    if (!selectedValue) return;
+
+    if (ewalletMethods.includes(selectedValue)) {
+      let qrSrc = selectedOption?.dataset.qr;
+      if (!qrSrc) {
+        console.warn(`No data-qr for ${selectedValue}, falling back to default`);
+        qrSrc = './image/QR.png';
+      }
+      showQRAndRequireReceipt(qrSrc, selectedValue);
+      return;
+    }
+
+    if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
+      const url = selectedOption?.dataset.url;
+      if (url) window.open(url, '_blank');
+    }
+    // COD: nothing needed
+  };
+
+  // Grab elements and attach events ONLY when modal is shown
+  paymentModal.addEventListener('show.bs.modal', () => {
+    // Refresh element references
+    qrContainer = document.getElementById('qrCodeContainer');
+    qrImage = document.getElementById('qrCodeImage');
+    receiptUpload = document.getElementById('receiptUpload');
+    submitBtn = document.getElementById('submitOrderBtn');
+    receiptRequired = document.getElementById('receiptRequired');
+    instructionText = qrContainer?.querySelector('p.fw-bold');
+
+    resetPaymentExtras();
+
+    // Re-attach change listener (in case of multiple opens)
+    paymentMethodSelect.removeEventListener('change', handlePaymentChange);
+    paymentMethodSelect.addEventListener('change', handlePaymentChange);
+
+    // Receipt upload enables button
+    if (receiptUpload) {
+      receiptUpload.removeEventListener('change', handleReceiptChange);
+      receiptUpload.addEventListener('change', handleReceiptChange);
+    }
+
+    // Trigger change in case a method was pre-selected
+    if (paymentMethodSelect.value) {
+      handlePaymentChange();
+    }
+  });
+
+  const handleReceiptChange = () => {
+    if (ewalletMethods.includes(paymentMethodSelect.value)) {
+      const hasFile = receiptUpload.files && receiptUpload.files.length > 0;
+      submitBtn.disabled = !hasFile;
+      receiptRequired.classList.toggle('d-none', hasFile);
+    }
+  };
+});
+// Final UI update
 updateUI();
