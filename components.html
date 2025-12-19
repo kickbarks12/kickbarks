@@ -148,11 +148,89 @@
         ></button>
       </div>
       <div class="modal-body">
-        <form id="paymentDetailsForm">
+        <form id="paymentDetailsForm" class="needs-validation" novalidate>
+          <!-- 1. PROMINENT TOTAL DISPLAY -->
+          <div
+            class="alert alert-primary text-center fw-bold fs-4 mb-4 shadow-sm rounded"
+            id="orderTotalDisplay"
+          >
+            <i class="bi bi-cart4 me-2"></i>
+            Order Total: ₱<span id="orderTotalAmount">0</span>
+          </div>
+
+          <!-- 2. CART ITEMS SUMMARY (COLLAPSIBLE) -->
+          <div class="accordion mb-4" id="cartSummaryAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed fw-bold"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#cartSummary"
+                >
+                  View Order Items (<span id="cartItemsCount">0</span>)
+                </button>
+              </h2>
+              <div
+                id="cartSummary"
+                class="accordion-collapse collapse"
+                data-bs-parent="#cartSummaryAccordion"
+              >
+                <div class="accordion-body" id="cartSummaryList">
+                  <p class="text-muted small">Your items will appear here.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. SHIPPING FEE & FINAL TOTAL BREAKDOWN -->
+          <div class="card border-primary mb-4">
+            <div class="card-body">
+              <div class="row g-3 text-muted">
+                <div class="col-8">Subtotal</div>
+                <div class="col-4 text-end">
+                  ₱<span id="subtotalAmount">0</span>
+                </div>
+
+                <div class="col-8">
+                  Shipping Fee
+                  <span class="text-success small">(Free over ₱5,000!)</span>
+                </div>
+                <div class="col-4 text-end" id="shippingFee">₱150</div>
+
+                <div class="col-12 border-top pt-3"></div>
+                <div class="col-8 fw-bold fs-5">Grand Total</div>
+                <div class="col-4 text-end fw-bold fs-5 text-primary">
+                  ₱<span id="grandTotalAmount">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. PROMO CODE FIELD -->
+          <div class="input-group mb-4">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter promo code"
+              id="promoCodeInput"
+            />
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              id="applyPromoBtn"
+            >
+              Apply
+            </button>
+            <div class="invalid-feedback d-block mt-1" id="promoFeedback"></div>
+          </div>
+
+          <!-- Rest of your form (personal info, payment method, etc.) -->
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Full Name *</label>
               <input type="text" class="form-control" id="payerName" required />
+              <div class="invalid-feedback">Please enter your name</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">Email *</label>
@@ -162,6 +240,7 @@
                 id="payerEmail"
                 required
               />
+              <div class="invalid-feedback">Please enter a valid email</div>
             </div>
             <div class="col-12">
               <label class="form-label">Delivery Address *</label>
@@ -171,6 +250,7 @@
                 rows="3"
                 required
               ></textarea>
+              <div class="invalid-feedback">Please enter your address</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">Birthday * (MM/DD/YYYY)</label>
@@ -180,10 +260,11 @@
                 id="payerBirthday"
                 placeholder="e.g. 01/01/2000"
                 pattern="(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(19|20)\d\d"
-                title="Please enter date as MM/DD/YYYY (e.g. 01/01/2000)"
+                title="Please enter date as MM/DD/YYYY"
                 required
               />
               <small class="text-muted">Format: MM/DD/YYYY</small>
+              <div class="invalid-feedback">Invalid date format</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">Age *</label>
@@ -194,29 +275,20 @@
                 min="18"
                 required
               />
+              <div class="invalid-feedback">You must be 18+</div>
             </div>
+
+            <!-- Payment Method & QR (unchanged) -->
             <div class="col-12">
               <label class="form-label">Payment Method *</label>
               <select class="form-select" id="paymentMethod" required>
                 <option value="">-- Choose Payment Method --</option>
-                <option value="QRPH" data-qr="./image/QR.png" data-type="qrph">
+                <option value="QRPH" data-qr="./image/QR.png">
                   QRPH (Scan to Pay - Any E-Wallet/Bank)
                 </option>
-                <option
-                  value="GCash"
-                  data-qr="/image/gcash.png"
-                  data-type="qrph"
-                >
-                  GCash
-                </option>
-                <option value="Maya" data-qr="/image/maya.png" data-type="qrph">
-                  Maya
-                </option>
-                <option
-                  value="ShopeePay"
-                  data-qr="/image/shopeepay.png"
-                  data-type="qrph"
-                >
+                <option value="GCash" data-qr="/image/gcash.png">GCash</option>
+                <option value="Maya" data-qr="/image/maya.png">Maya</option>
+                <option value="ShopeePay" data-qr="/image/shopeepay.png">
                   ShopeePay
                 </option>
                 <option
@@ -239,13 +311,13 @@
                 </option>
                 <option value="COD">Cash on Delivery (COD)</option>
               </select>
-              <!-- QR Code Container -->
+
               <div id="qrCodeContainer" class="text-center mt-4 d-none">
                 <p class="fw-bold mb-3">Scan to Pay with QRPH</p>
                 <img
                   id="qrCodeImage"
                   src=""
-                  alt="QRPH Code"
+                  alt="QR Code"
                   class="img-fluid border rounded shadow"
                   style="max-width: 300px"
                 />
@@ -253,8 +325,6 @@
                   After payment, upload your receipt below to complete the
                   order.
                 </p>
-
-                <!-- Receipt Upload -->
                 <div class="mt-4">
                   <label for="receiptUpload" class="form-label fw-bold"
                     >Upload Receipt *</label
@@ -273,6 +343,7 @@
               </div>
             </div>
           </div>
+
           <div class="mt-4 text-center">
             <button
               type="submit"
@@ -285,6 +356,14 @@
               Please upload your payment receipt to continue.
             </p>
           </div>
+
+          <!-- Terms note -->
+          <p class="text-center text-muted small mt-3">
+            By submitting, you agree to our
+            <a href="#" class="text-decoration-underline">Terms of Service</a>
+            and
+            <a href="#" class="text-decoration-underline">Privacy Policy</a>.
+          </p>
         </form>
       </div>
     </div>

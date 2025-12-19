@@ -1,4 +1,3 @@
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 let currentUser = localStorage.getItem('currentUser') || null;
 
@@ -16,6 +15,11 @@ const products = [
 ];
 
 const brands = [...new Set(products.map(p => p.brand))].sort();
+
+// === CART HELPERS ===
+const getCart = () => JSON.parse(localStorage.getItem('cart')) || [];
+const saveCart = (newCart) => localStorage.setItem('cart', JSON.stringify(newCart));
+const calculateTotal = () => getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
 
 let brandContainer = null, productContainer = null, searchInput = null, clearFilterBtn = null;
 
@@ -79,6 +83,8 @@ function filterByBrand(brandName) {
 }
 
 function updateUI() {
+  const currentCart = getCart();
+
   const cartBtn = document.getElementById('cartBtn');
   const cartCount = document.getElementById('cartCount');
   const cartItemsDiv = document.getElementById('cartItems');
@@ -103,14 +109,16 @@ function updateUI() {
       if (cartBtn) cartBtn.style.display = 'none';
     }
   }
-  if (cartCount) cartCount.textContent = cart.length;
+
+  if (cartCount) cartCount.textContent = currentCart.length;
+
   if (cartItemsDiv && cartTotalSpan) {
     cartItemsDiv.innerHTML = '';
     let total = 0;
-    if (cart.length === 0) {
+    if (currentCart.length === 0) {
       cartItemsDiv.innerHTML = '<p class="text-muted">Your cart is empty.</p>';
     } else {
-      cart.forEach((item, i) => {
+      currentCart.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'd-flex justify-content-between align-items-center mb-3 pb-2 border-bottom';
         div.innerHTML = `<div><strong>${item.name}</strong><br>${item.motorcycle && item.motorcycle !== 'Universal' ? `<small class="text-success">→ ${item.motorcycle}</small><br>` : ''}<small>× ${item.qty}</small></div>
@@ -124,8 +132,9 @@ function updateUI() {
 }
 
 window.removeFromCart = function(i) {
-  cart.splice(i, 1);
-  localStorage.setItem('cart', JSON.stringify(cart));
+  const currentCart = getCart();
+  currentCart.splice(i, 1);
+  saveCart(currentCart);
   updateUI();
 };
 
@@ -135,8 +144,9 @@ window.addToCart = function(name, price, qty = 1, motorcycle = '') {
     new bootstrap.Modal(document.getElementById('loginModal')).show();
     return;
   }
-  cart.push({ name, price, qty: parseInt(qty), motorcycle: motorcycle || 'Universal' });
-  localStorage.setItem('cart', JSON.stringify(cart));
+  const currentCart = getCart();
+  currentCart.push({ name, price, qty: parseInt(qty), motorcycle: motorcycle || 'Universal' });
+  saveCart(currentCart);
   updateUI();
   alert('Added to cart!');
 };
@@ -160,21 +170,13 @@ function attachAddToCartButtons() {
   });
 }
 
-function loadSavedCredentials() {
-  const saved = localStorage.getItem('rememberedCredentials');
-  if (saved) {
-    const { username, password } = JSON.parse(saved);
-    document.getElementById('loginUsername').value = username;
-    document.getElementById('loginPassword').value = password;
-    document.getElementById('rememberMe').checked = true;
-  }
-}
-
+// === SINGLE DOMCONTENTLOADED ===
 document.addEventListener('DOMContentLoaded', () => {
   brandContainer = document.getElementById('brandList');
   productContainer = document.getElementById('productList');
   searchInput = document.getElementById('searchInput');
   clearFilterBtn = document.getElementById('clearFilter');
+
   renderBrands();
   renderProducts();
   attachAddToCartButtons();
@@ -200,8 +202,179 @@ document.addEventListener('DOMContentLoaded', () => {
     const filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.brand.toLowerCase().includes(term));
     renderProducts(filtered);
   });
+
+  // === PAYMENT MODAL LOGIC ===
+  const paymentMethodSelect = document.getElementById('paymentMethod');
+  const paymentModal = document.getElementById('paymentDetailsModal');
+
+  if (paymentMethodSelect && paymentModal) {
+    let qrContainer, qrImage, receiptUpload, submitBtn, receiptRequired, instructionText;
+    let promoApplied = false; // Track if promo is applied
+
+    const ewalletMethods = ['QRPH', 'GCash', 'Maya', 'ShopeePay'];
+
+    const resetPaymentExtras = () => {
+      if (qrContainer) qrContainer.classList.add('d-none');
+      if (qrImage) qrImage.src = '';
+      if (receiptUpload) {
+        receiptUpload.value = '';
+        receiptUpload.required = false;
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      if (receiptRequired) receiptRequired.classList.add('d-none');
+      if (instructionText) instructionText.textContent = 'Scan to Pay with QRPH';
+    };
+
+    const showQRAndRequireReceipt = (qrSrc, methodName, grandTotal) => {
+      qrContainer.classList.remove('d-none');
+      qrImage.src = qrSrc || './image/QR.png';
+      instructionText.textContent = `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using ${methodName}`;
+
+      receiptUpload.required = true;
+      submitBtn.disabled = true;
+      receiptRequired.classList.remove('d-none');
+    };
+
+    const handlePaymentChange = () => {
+      resetPaymentExtras();
+
+      const selectedValue = paymentMethodSelect.value;
+      const selectedOption = paymentMethodSelect.selectedOptions[0];
+
+      if (!selectedValue) return;
+
+      const subtotal = calculateTotal();
+      const shipping = subtotal >= 5000 ? 0 : 150;
+      let grandTotal = subtotal + shipping;
+
+      if (promoApplied) {
+        grandTotal = Math.round(grandTotal * 0.90); // 10% off
+      }
+
+      if (ewalletMethods.includes(selectedValue)) {
+        let qrSrc = selectedOption?.dataset.qr || './image/QR.png';
+        showQRAndRequireReceipt(qrSrc, selectedValue, grandTotal);
+        return;
+      }
+
+      if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
+        const url = selectedOption?.dataset.url;
+        if (url) window.open(url, '_blank');
+      }
+    };
+
+    const handleReceiptChange = () => {
+      if (ewalletMethods.includes(paymentMethodSelect.value)) {
+        const hasFile = receiptUpload.files && receiptUpload.files.length > 0;
+        submitBtn.disabled = !hasFile;
+        receiptRequired.classList.toggle('d-none', hasFile);
+      }
+    };
+
+    paymentModal.addEventListener('show.bs.modal', () => {
+      setTimeout(() => {
+        qrContainer = document.getElementById('qrCodeContainer');
+        qrImage = document.getElementById('qrCodeImage');
+        receiptUpload = document.getElementById('receiptUpload');
+        submitBtn = document.getElementById('submitOrderBtn');
+        receiptRequired = document.getElementById('receiptRequired');
+        instructionText = qrContainer?.querySelector('p.fw-bold');
+
+        resetPaymentExtras();
+
+        const subtotal = calculateTotal();
+        const cart = getCart();
+
+        // Update prominent total
+        const totalElement = document.getElementById('orderTotalAmount');
+        if (totalElement) {
+          totalElement.textContent = subtotal > 0 ? subtotal.toLocaleString('en-PH') : '0';
+        }
+
+        // Cart summary
+        const itemsCount = document.getElementById('cartItemsCount');
+        const summaryList = document.getElementById('cartSummaryList');
+        if (itemsCount) itemsCount.textContent = cart.length;
+        if (summaryList) {
+          summaryList.innerHTML = '';
+          if (cart.length === 0) {
+            summaryList.innerHTML = '<p class="text-muted small">Your cart is empty.</p>';
+          } else {
+            cart.forEach(item => {
+              const p = document.createElement('p');
+              p.className = 'mb-1 small';
+              p.innerHTML = `<strong>${item.name}</strong><br>
+                             ${item.motorcycle && item.motorcycle !== 'Universal' ? `<small class="text-success">→ ${item.motorcycle}</small><br>` : ''}
+                             <small>× ${item.qty} = ₱${(item.price * item.qty).toLocaleString('en-PH')}</small>`;
+              summaryList.appendChild(p);
+            });
+          }
+        }
+
+        // Shipping & grand total
+        const shipping = subtotal >= 5000 ? 0 : 150;
+        let grandTotal = subtotal + shipping;
+
+        document.getElementById('subtotalAmount').textContent = subtotal.toLocaleString('en-PH');
+        document.getElementById('shippingFee').textContent = shipping === 0 ? 'FREE!' : '₱150';
+        document.getElementById('grandTotalAmount').textContent = grandTotal.toLocaleString('en-PH');
+
+        // Promo code - attach only once
+        const applyBtn = document.getElementById('applyPromoBtn');
+        const promoInput = document.getElementById('promoCodeInput');
+        const promoFeedback = document.getElementById('promoFeedback');
+
+        if (applyBtn && promoInput && promoFeedback) {
+          // Remove any previous listener to prevent duplicates
+          applyBtn.replaceWith(applyBtn.cloneNode(true));
+          const newApplyBtn = document.getElementById('applyPromoBtn');
+
+          newApplyBtn.onclick = () => {
+            const code = promoInput.value.trim().toUpperCase();
+            promoApplied = false;
+
+            if (code === 'KICK10') {
+              const discount = Math.round(grandTotal * 0.10);
+              grandTotal -= discount;
+              promoApplied = true;
+              promoFeedback.textContent = `Applied KICK10! ₱${discount} off`;
+              promoFeedback.className = 'text-success mt-1 d-block';
+            } else if (code === '') {
+              promoFeedback.textContent = '';
+            } else {
+              promoFeedback.textContent = 'Invalid promo code';
+              promoFeedback.className = 'text-danger mt-1 d-block';
+            }
+
+            document.getElementById('grandTotalAmount').textContent = grandTotal.toLocaleString('en-PH');
+            handlePaymentChange(); // Update QR if needed
+          };
+        }
+
+        // Update QR instruction
+        if (instructionText && grandTotal > 0) {
+          instructionText.textContent = `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using selected method`;
+        }
+
+        // Re-attach listeners
+        paymentMethodSelect.removeEventListener('change', handlePaymentChange);
+        paymentMethodSelect.addEventListener('change', handlePaymentChange);
+
+        if (receiptUpload) {
+          receiptUpload.removeEventListener('change', handleReceiptChange);
+          receiptUpload.addEventListener('change', handleReceiptChange);
+        }
+
+        if (paymentMethodSelect.value) {
+          handlePaymentChange();
+        }
+
+      }, 150);
+    });
+  }
 });
 
+// === OTHER EVENTS ===
 document.addEventListener('submit', e => {
   if (e.target.id === 'loginForm') {
     e.preventDefault();
@@ -235,7 +408,8 @@ document.addEventListener('click', e => {
   }
 
   if (e.target.id === 'checkoutBtn') {
-    if (cart.length === 0) return alert('Cart is empty!');
+    const currentCart = getCart();
+    if (currentCart.length === 0) return alert('Cart is empty!');
     bootstrap.Modal.getInstance(document.getElementById('cartModal'))?.hide();
     new bootstrap.Modal(document.getElementById('paymentDetailsModal')).show();
   }
@@ -245,6 +419,11 @@ document.addEventListener('submit', e => {
   if (e.target.id === 'paymentDetailsForm') {
     e.preventDefault();
 
+    if (!e.target.checkValidity()) {
+      e.target.classList.add('was-validated');
+      return;
+    }
+
     const name = document.getElementById('payerName').value.trim();
     const email = document.getElementById('payerEmail').value.trim();
     const address = document.getElementById('payerAddress').value.trim();
@@ -252,39 +431,32 @@ document.addEventListener('submit', e => {
     const age = document.getElementById('payerAge').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
 
-    if (!name || !email || !address || !birthday || !age || !paymentMethod) {
-      alert('Please fill in all fields!');
-      return;
-    }
+    const subtotal = calculateTotal();
+    const shipping = subtotal >= 5000 ? 0 : 150;
+    let grandTotal = subtotal + shipping;
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    // Apply promo if used (we'll use the displayed one)
+    const displayedGrand = parseInt(document.getElementById('grandTotalAmount').textContent.replace(/[^0-9]/g, '')) || grandTotal;
+    grandTotal = displayedGrand;
 
-    // === SEND REAL EMAIL ===
     emailjs.send('service_438wssi', 'template_j27m6cr', {
       to_name: name,
       to_email: email,
-      total: '₱' + total.toLocaleString(),
+      total: '₱' + grandTotal.toLocaleString(),
       payment_method: paymentMethod,
-      order_items: cart.map(item => `${item.name} × ${item.qty}`).join('\n'),
+      order_items: getCart().map(item => `${item.name} × ${item.qty}`).join('\n'),
       delivery_address: address
     })
-    .then(() => {
-      console.log('Email sent successfully!');
-    })
-    .catch((err) => {
-      console.error('Email failed:', err);
-      // Still show success even if email fails (optional)
-    });
+    .then(() => console.log('Email sent successfully!'))
+    .catch(err => console.error('Email failed:', err));
 
-    // Show success
     document.getElementById('paymentSummary').textContent = 
-      `Total: ₱${total.toLocaleString()} • Payment: ${paymentMethod}`;
+      `Total: ₱${grandTotal.toLocaleString()} • Payment: ${paymentMethod}`;
 
     bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
     new bootstrap.Modal(document.getElementById('successModal')).show();
 
-    cart = [];
-    localStorage.setItem('cart', '[]');
+    saveCart([]);
     updateUI();
 
     document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
@@ -293,106 +465,5 @@ document.addEventListener('submit', e => {
   }
 });
 
-
-
-
-
-// === FINAL PAYMENT METHOD & QR + RECEIPT LOGIC (GUARANTEED TO WORK) ===
-document.addEventListener('DOMContentLoaded', () => {
-  const paymentMethodSelect = document.getElementById('paymentMethod');
-  const paymentModal = document.getElementById('paymentDetailsModal');
-
-  if (!paymentMethodSelect || !paymentModal) return;
-
-  // These will be grabbed fresh every time modal opens (safer)
-  let qrContainer, qrImage, receiptUpload, submitBtn, receiptRequired, instructionText;
-
-  const ewalletMethods = ['QRPH', 'GCash', 'Maya', 'ShopeePay'];
-
-  const resetPaymentExtras = () => {
-    if (qrContainer) qrContainer.classList.add('d-none');
-    if (qrImage) qrImage.src = '';
-    if (receiptUpload) {
-      receiptUpload.value = '';
-      receiptUpload.required = false;
-    }
-    if (submitBtn) submitBtn.disabled = false;
-    if (receiptRequired) receiptRequired.classList.add('d-none');
-    if (instructionText) instructionText.textContent = 'Scan to Pay with QRPH';
-  };
-
-  const showQRAndRequireReceipt = (qrSrc, methodName) => {
-    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0).toLocaleString('en-PH');
-
-    qrContainer.classList.remove('d-none');
-    qrImage.src = qrSrc || './image/QR.png';  // Strong fallback
-    instructionText.textContent = `Scan to pay ₱${total} using ${methodName}`;
-
-    receiptUpload.required = true;
-    submitBtn.disabled = true;
-    receiptRequired.classList.remove('d-none');
-  };
-
-  const handlePaymentChange = () => {
-    resetPaymentExtras();
-
-    const selectedValue = paymentMethodSelect.value;
-    const selectedOption = paymentMethodSelect.selectedOptions[0];
-
-    if (!selectedValue) return;
-
-    if (ewalletMethods.includes(selectedValue)) {
-      let qrSrc = selectedOption?.dataset.qr;
-      if (!qrSrc) {
-        console.warn(`No data-qr for ${selectedValue}, falling back to default`);
-        qrSrc = './image/QR.png';
-      }
-      showQRAndRequireReceipt(qrSrc, selectedValue);
-      return;
-    }
-
-    if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
-      const url = selectedOption?.dataset.url;
-      if (url) window.open(url, '_blank');
-    }
-    // COD: nothing needed
-  };
-
-  // Grab elements and attach events ONLY when modal is shown
-  paymentModal.addEventListener('show.bs.modal', () => {
-    // Refresh element references
-    qrContainer = document.getElementById('qrCodeContainer');
-    qrImage = document.getElementById('qrCodeImage');
-    receiptUpload = document.getElementById('receiptUpload');
-    submitBtn = document.getElementById('submitOrderBtn');
-    receiptRequired = document.getElementById('receiptRequired');
-    instructionText = qrContainer?.querySelector('p.fw-bold');
-
-    resetPaymentExtras();
-
-    // Re-attach change listener (in case of multiple opens)
-    paymentMethodSelect.removeEventListener('change', handlePaymentChange);
-    paymentMethodSelect.addEventListener('change', handlePaymentChange);
-
-    // Receipt upload enables button
-    if (receiptUpload) {
-      receiptUpload.removeEventListener('change', handleReceiptChange);
-      receiptUpload.addEventListener('change', handleReceiptChange);
-    }
-
-    // Trigger change in case a method was pre-selected
-    if (paymentMethodSelect.value) {
-      handlePaymentChange();
-    }
-  });
-
-  const handleReceiptChange = () => {
-    if (ewalletMethods.includes(paymentMethodSelect.value)) {
-      const hasFile = receiptUpload.files && receiptUpload.files.length > 0;
-      submitBtn.disabled = !hasFile;
-      receiptRequired.classList.toggle('d-none', hasFile);
-    }
-  };
-});
-// Final UI update
+// Initial update
 updateUI();
