@@ -312,6 +312,7 @@
                 <option value="COD">Cash on Delivery (COD)</option>
               </select>
 
+              <!-- QR / Receipt Section -->
               <div id="qrCodeContainer" class="text-center mt-4 d-none">
                 <p class="fw-bold mb-3">Scan to Pay with QRPH</p>
                 <img
@@ -326,21 +327,25 @@
                   order.
                 </p>
                 <div class="mt-4">
-                  <label for="receiptUpload" class="form-label fw-bold"
-                    >Upload Receipt *</label
-                  >
+                  <label for="receiptUpload" class="form-label fw-bold">
+                    Upload Receipt *
+                  </label>
                   <input
                     type="file"
                     class="form-control"
                     id="receiptUpload"
                     accept="image/*"
-                    required
+                    disabled
                   />
-                  <small class="text-muted"
-                    >Take a screenshot or photo of your payment receipt.</small
-                  >
+                  <small class="text-muted">
+                    Take a screenshot or photo of your payment receipt.
+                  </small>
                 </div>
               </div>
+
+              <p class="text-muted small mt-2 d-none" id="receiptRequired">
+                Please upload your payment receipt to continue.
+              </p>
             </div>
           </div>
 

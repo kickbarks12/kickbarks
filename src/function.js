@@ -213,55 +213,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ewalletMethods = ['QRPH', 'GCash', 'Maya', 'ShopeePay'];
 
-    const resetPaymentExtras = () => {
-      if (qrContainer) qrContainer.classList.add('d-none');
-      if (qrImage) qrImage.src = '';
-      if (receiptUpload) {
-        receiptUpload.value = '';
-        receiptUpload.required = false;
-      }
-      if (submitBtn) submitBtn.disabled = false;
-      if (receiptRequired) receiptRequired.classList.add('d-none');
-      if (instructionText) instructionText.textContent = 'Scan to Pay with QRPH';
-    };
+const handlePaymentChange = () => {
+  resetPaymentExtras();
 
-    const showQRAndRequireReceipt = (qrSrc, methodName, grandTotal) => {
-      qrContainer.classList.remove('d-none');
-      qrImage.src = qrSrc || './image/QR.png';
-      instructionText.textContent = `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using ${methodName}`;
+  const selectedValue = paymentMethodSelect.value;
+  const selectedOption = paymentMethodSelect.selectedOptions[0];
 
-      receiptUpload.required = true;
-      submitBtn.disabled = true;
-      receiptRequired.classList.remove('d-none');
-    };
+  if (!selectedValue) return;
 
-    const handlePaymentChange = () => {
-      resetPaymentExtras();
+  const subtotal = calculateTotal();
+  const shipping = subtotal >= 5000 ? 0 : 150;
+  let grandTotal = subtotal + shipping;
 
-      const selectedValue = paymentMethodSelect.value;
-      const selectedOption = paymentMethodSelect.selectedOptions[0];
+  if (promoApplied) {
+    grandTotal = Math.round(grandTotal * 0.90);
+  }
 
-      if (!selectedValue) return;
+  // ===============================
+  // QR / E-WALLET → RECEIPT REQUIRED
+  // ===============================
+  if (ewalletMethods.includes(selectedValue)) {
+    qrContainer.classList.remove('d-none');
+    qrImage.src = selectedOption?.dataset.qr || './image/QR.png';
+    instructionText.textContent =
+      `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using ${selectedValue}`;
 
-      const subtotal = calculateTotal();
-      const shipping = subtotal >= 5000 ? 0 : 150;
-      let grandTotal = subtotal + shipping;
+    receiptUpload.disabled = false;
+    receiptUpload.required = true;
 
-      if (promoApplied) {
-        grandTotal = Math.round(grandTotal * 0.90); // 10% off
-      }
+    submitBtn.disabled = true;
+    receiptRequired.classList.remove('d-none');
+    return;
+  }
 
-      if (ewalletMethods.includes(selectedValue)) {
-        let qrSrc = selectedOption?.dataset.qr || './image/QR.png';
-        showQRAndRequireReceipt(qrSrc, selectedValue, grandTotal);
-        return;
-      }
+  // ===============================
+  // COD / BANKS → NO RECEIPT
+  // ===============================
+  qrContainer.classList.add('d-none');
 
-      if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
-        const url = selectedOption?.dataset.url;
-        if (url) window.open(url, '_blank');
-      }
-    };
+  receiptUpload.required = false;
+  receiptUpload.disabled = true; // 🔑 THIS IS THE FIX
+  receiptUpload.value = '';
+
+  submitBtn.disabled = false;
+  receiptRequired.classList.add('d-none');
+
+  // Open bank links
+  if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
+    const url = selectedOption?.dataset.url;
+    if (url) window.open(url, '_blank');
+  }
+};
+
+
 
     const handleReceiptChange = () => {
       if (ewalletMethods.includes(paymentMethodSelect.value)) {
@@ -375,6 +379,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // === OTHER EVENTS ===
+
+const forceDisableReceiptIfNotQR = () => {
+  const paymentMethod = document.getElementById('paymentMethod')?.value;
+  const receiptUpload = document.getElementById('receiptUpload');
+
+  if (!receiptUpload) return;
+
+  if (!['QRPH', 'GCash', 'Maya', 'ShopeePay'].includes(paymentMethod)) {
+    receiptUpload.required = false;
+    receiptUpload.disabled = true;
+    receiptUpload.value = '';
+  }
+};
+
 document.addEventListener('submit', e => {
   if (e.target.id === 'loginForm') {
     e.preventDefault();
@@ -419,6 +437,9 @@ document.addEventListener('submit', e => {
   if (e.target.id === 'paymentDetailsForm') {
     e.preventDefault();
 
+    // 🔑 FORCE receipt OFF for COD & BANKS before validation
+    forceDisableReceiptIfNotQR();
+
     if (!e.target.checkValidity()) {
       e.target.classList.add('was-validated');
       return;
@@ -427,16 +448,19 @@ document.addEventListener('submit', e => {
     const name = document.getElementById('payerName').value.trim();
     const email = document.getElementById('payerEmail').value.trim();
     const address = document.getElementById('payerAddress').value.trim();
-    const birthday = document.getElementById('payerBirthday').value;
-    const age = document.getElementById('payerAge').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
 
     const subtotal = calculateTotal();
     const shipping = subtotal >= 5000 ? 0 : 150;
     let grandTotal = subtotal + shipping;
 
-    // Apply promo if used (we'll use the displayed one)
-    const displayedGrand = parseInt(document.getElementById('grandTotalAmount').textContent.replace(/[^0-9]/g, '')) || grandTotal;
+    const displayedGrand =
+      parseInt(
+        document
+          .getElementById('grandTotalAmount')
+          .textContent.replace(/[^0-9]/g, '')
+      ) || grandTotal;
+
     grandTotal = displayedGrand;
 
     emailjs.send('service_438wssi', 'template_j27m6cr', {
@@ -444,26 +468,39 @@ document.addEventListener('submit', e => {
       to_email: email,
       total: '₱' + grandTotal.toLocaleString(),
       payment_method: paymentMethod,
-      order_items: getCart().map(item => `${item.name} × ${item.qty}`).join('\n'),
+      order_items: getCart()
+        .map(item => `${item.name} × ${item.qty}`)
+        .join('\n'),
       delivery_address: address
-    })
-    .then(() => console.log('Email sent successfully!'))
-    .catch(err => console.error('Email failed:', err));
+    });
 
-    document.getElementById('paymentSummary').textContent = 
+    document.getElementById('paymentSummary').textContent =
       `Total: ₱${grandTotal.toLocaleString()} • Payment: ${paymentMethod}`;
 
-    bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
-    new bootstrap.Modal(document.getElementById('successModal')).show();
+    bootstrap.Modal.getInstance(
+      document.getElementById('paymentDetailsModal')
+    ).hide();
+
+    new bootstrap.Modal(
+      document.getElementById('successModal')
+    ).show();
 
     saveCart([]);
     updateUI();
 
-    document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
-      new bootstrap.Modal(document.getElementById('emailSentModal')).show();
-    }, { once: true });
+    document
+      .getElementById('successModal')
+      .addEventListener(
+        'hidden.bs.modal',
+        () =>
+          new bootstrap.Modal(
+            document.getElementById('emailSentModal')
+          ).show(),
+        { once: true }
+      );
   }
 });
+
 
 // Initial update
 updateUI();
