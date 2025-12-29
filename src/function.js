@@ -203,75 +203,56 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProducts(filtered);
   });
 
-  // === PAYMENT MODAL LOGIC ===
+       // === PAYMENT MODAL LOGIC ===
   const paymentMethodSelect = document.getElementById('paymentMethod');
   const paymentModal = document.getElementById('paymentDetailsModal');
 
   if (paymentMethodSelect && paymentModal) {
-    let qrContainer, qrImage, receiptUpload, submitBtn, receiptRequired, instructionText;
-    let promoApplied = false; // Track if promo is applied
-
+    let qrContainer, qrImage, receiptSection, receiptUpload, submitBtn, receiptRequired, instructionText;
+    let promoApplied = false;
     const ewalletMethods = ['QRPH', 'GCash', 'Maya', 'ShopeePay'];
 
-const handlePaymentChange = () => {
-  resetPaymentExtras();
+    const resetPaymentState = () => {
+      if (qrContainer) qrContainer.classList.add('d-none');
+      if (receiptSection) receiptSection.classList.add('d-none');
+      if (receiptUpload) {
+        receiptUpload.required = false;
+        receiptUpload.removeAttribute('required');
+        receiptUpload.value = '';
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      if (receiptRequired) receiptRequired.classList.add('d-none');
+    };
 
-  const selectedValue = paymentMethodSelect.value;
-  const selectedOption = paymentMethodSelect.selectedOptions[0];
+    const updatePaymentUI = () => {
+      resetPaymentState();
 
-  if (!selectedValue) return;
+      const selected = paymentMethodSelect.value;
+      if (!selected) return;
 
-  const subtotal = calculateTotal();
-  const shipping = subtotal >= 5000 ? 0 : 150;
-  let grandTotal = subtotal + shipping;
+      const subtotal = calculateTotal();
+      const shipping = subtotal >= 5000 ? 0 : 150;
+      let total = subtotal + shipping;
+      if (promoApplied) total = Math.round(total * 0.90);
 
-  if (promoApplied) {
-    grandTotal = Math.round(grandTotal * 0.90);
-  }
+      const displayedTotal = parseInt(document.getElementById('grandTotalAmount').textContent.replace(/[^0-9]/g, '')) || total;
 
-  // ===============================
-  // QR / E-WALLET → RECEIPT REQUIRED
-  // ===============================
-  if (ewalletMethods.includes(selectedValue)) {
-    qrContainer.classList.remove('d-none');
-    qrImage.src = selectedOption?.dataset.qr || './image/QR.png';
-    instructionText.textContent =
-      `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using ${selectedValue}`;
+      if (ewalletMethods.includes(selected)) {
+        qrContainer.classList.remove('d-none');
+        qrImage.src = paymentMethodSelect.selectedOptions[0]?.dataset.qr || './image/QR.png';
+        instructionText.textContent = `Scan to pay ₱${displayedTotal.toLocaleString('en-PH')} using ${selected}`;
 
-    receiptUpload.disabled = false;
-    receiptUpload.required = true;
+        receiptSection.classList.remove('d-none');
+        receiptUpload.required = true;
+        receiptUpload.setAttribute('required', '');
 
-    submitBtn.disabled = true;
-    receiptRequired.classList.remove('d-none');
-    return;
-  }
-
-  // ===============================
-  // COD / BANKS → NO RECEIPT
-  // ===============================
-  qrContainer.classList.add('d-none');
-
-  receiptUpload.required = false;
-  receiptUpload.disabled = true; // 🔑 THIS IS THE FIX
-  receiptUpload.value = '';
-
-  submitBtn.disabled = false;
-  receiptRequired.classList.add('d-none');
-
-  // Open bank links
-  if (['BDO', 'BPI', 'Metrobank'].includes(selectedValue)) {
-    const url = selectedOption?.dataset.url;
-    if (url) window.open(url, '_blank');
-  }
-};
-
-
-
-    const handleReceiptChange = () => {
-      if (ewalletMethods.includes(paymentMethodSelect.value)) {
-        const hasFile = receiptUpload.files && receiptUpload.files.length > 0;
+        const hasFile = receiptUpload.files.length > 0;
         submitBtn.disabled = !hasFile;
         receiptRequired.classList.toggle('d-none', hasFile);
+      } else {
+        submitBtn.disabled = false;
+        const bankUrl = paymentMethodSelect.selectedOptions[0]?.dataset.url;
+        if (bankUrl) window.open(bankUrl, '_blank');
       }
     };
 
@@ -279,26 +260,29 @@ const handlePaymentChange = () => {
       setTimeout(() => {
         qrContainer = document.getElementById('qrCodeContainer');
         qrImage = document.getElementById('qrCodeImage');
+        receiptSection = document.getElementById('receiptSection');
         receiptUpload = document.getElementById('receiptUpload');
         submitBtn = document.getElementById('submitOrderBtn');
         receiptRequired = document.getElementById('receiptRequired');
-        instructionText = qrContainer?.querySelector('p.fw-bold');
+        instructionText = document.getElementById('qrInstructionText');
 
-        resetPaymentExtras();
+        resetPaymentState();
+        promoApplied = false;
 
         const subtotal = calculateTotal();
-        const cart = getCart();
+        const shipping = subtotal >= 5000 ? 0 : 150;
+        let grandTotal = subtotal + shipping;
 
-        // Update prominent total
-        const totalElement = document.getElementById('orderTotalAmount');
-        if (totalElement) {
-          totalElement.textContent = subtotal > 0 ? subtotal.toLocaleString('en-PH') : '0';
-        }
+        document.getElementById('orderTotalAmount').textContent = subtotal.toLocaleString('en-PH');
+        document.getElementById('subtotalAmount').textContent = subtotal.toLocaleString('en-PH');
+        document.getElementById('shippingFee').textContent = shipping === 0 ? 'FREE!' : '₱150';
+        document.getElementById('grandTotalAmount').textContent = grandTotal.toLocaleString('en-PH');
 
         // Cart summary
-        const itemsCount = document.getElementById('cartItemsCount');
+        const cart = getCart();
+        const itemsCountEl = document.getElementById('cartItemsCount');
         const summaryList = document.getElementById('cartSummaryList');
-        if (itemsCount) itemsCount.textContent = cart.length;
+        if (itemsCountEl) itemsCountEl.textContent = cart.length;
         if (summaryList) {
           summaryList.innerHTML = '';
           if (cart.length === 0) {
@@ -315,192 +299,176 @@ const handlePaymentChange = () => {
           }
         }
 
-        // Shipping & grand total
-        const shipping = subtotal >= 5000 ? 0 : 150;
-        let grandTotal = subtotal + shipping;
-
-        document.getElementById('subtotalAmount').textContent = subtotal.toLocaleString('en-PH');
-        document.getElementById('shippingFee').textContent = shipping === 0 ? 'FREE!' : '₱150';
-        document.getElementById('grandTotalAmount').textContent = grandTotal.toLocaleString('en-PH');
-
-        // Promo code - attach only once
+        // Promo code
         const applyBtn = document.getElementById('applyPromoBtn');
         const promoInput = document.getElementById('promoCodeInput');
         const promoFeedback = document.getElementById('promoFeedback');
 
         if (applyBtn && promoInput && promoFeedback) {
-          // Remove any previous listener to prevent duplicates
-          applyBtn.replaceWith(applyBtn.cloneNode(true));
-          const newApplyBtn = document.getElementById('applyPromoBtn');
+          const newBtn = applyBtn.cloneNode(true);
+          applyBtn.parentNode.replaceChild(newBtn, applyBtn);
 
-          newApplyBtn.onclick = () => {
+          newBtn.onclick = () => {
             const code = promoInput.value.trim().toUpperCase();
-            promoApplied = false;
+            let currentTotal = subtotal + shipping;
 
             if (code === 'KICK10') {
-              const discount = Math.round(grandTotal * 0.10);
-              grandTotal -= discount;
+              const discount = Math.round(currentTotal * 0.10);
+              currentTotal -= discount;
               promoApplied = true;
               promoFeedback.textContent = `Applied KICK10! ₱${discount} off`;
               promoFeedback.className = 'text-success mt-1 d-block';
-            } else if (code === '') {
-              promoFeedback.textContent = '';
-            } else {
+            } else if (code) {
               promoFeedback.textContent = 'Invalid promo code';
               promoFeedback.className = 'text-danger mt-1 d-block';
+            } else {
+              promoFeedback.textContent = '';
+              promoFeedback.className = '';
             }
 
-            document.getElementById('grandTotalAmount').textContent = grandTotal.toLocaleString('en-PH');
-            handlePaymentChange(); // Update QR if needed
+            document.getElementById('grandTotalAmount').textContent = currentTotal.toLocaleString('en-PH');
+            updatePaymentUI();
           };
         }
 
-        // Update QR instruction
-        if (instructionText && grandTotal > 0) {
-          instructionText.textContent = `Scan to pay ₱${grandTotal.toLocaleString('en-PH')} using selected method`;
-        }
+        // File upload listener
+        receiptUpload.onchange = () => {
+          const hasFile = receiptUpload.files.length > 0;
+          if (ewalletMethods.includes(paymentMethodSelect.value)) {
+            submitBtn.disabled = !hasFile;
+            receiptRequired.classList.toggle('d-none', hasFile);
+          }
+        };
 
-        // Re-attach listeners
-        paymentMethodSelect.removeEventListener('change', handlePaymentChange);
-        paymentMethodSelect.addEventListener('change', handlePaymentChange);
+        paymentMethodSelect.onchange = updatePaymentUI;
 
-        if (receiptUpload) {
-          receiptUpload.removeEventListener('change', handleReceiptChange);
-          receiptUpload.addEventListener('change', handleReceiptChange);
-        }
+        updatePaymentUI();
 
-        if (paymentMethodSelect.value) {
-          handlePaymentChange();
-        }
-
-      }, 150);
+      }, 100);
     });
   }
-});
 
-// === OTHER EVENTS ===
+  // === SIMPLIFIED forceDisableReceiptIfNotQR ===
+  const forceDisableReceiptIfNotQR = () => {
+    const paymentMethod = document.getElementById('paymentMethod')?.value || '';
+    const receiptUpload = document.getElementById('receiptUpload');
 
-const forceDisableReceiptIfNotQR = () => {
-  const paymentMethod = document.getElementById('paymentMethod')?.value;
-  const receiptUpload = document.getElementById('receiptUpload');
+    if (!receiptUpload) return;
 
-  if (!receiptUpload) return;
-
-  if (!['QRPH', 'GCash', 'Maya', 'ShopeePay'].includes(paymentMethod)) {
-    receiptUpload.required = false;
-    receiptUpload.disabled = true;
-    receiptUpload.value = '';
-  }
-};
-
-document.addEventListener('submit', e => {
-  if (e.target.id === 'loginForm') {
-    e.preventDefault();
-    const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-    const password = document.getElementById('loginPassword').value;
-    const remember = document.getElementById('rememberMe').checked;
-    if (users[username] && users[username] === password) {
-      isLoggedIn = true;
-      currentUser = username.charAt(0).toUpperCase() + username.slice(1);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', currentUser);
-      if (remember) localStorage.setItem('rememberedCredentials', JSON.stringify({ username, password }));
-      else localStorage.removeItem('rememberedCredentials');
-      updateUI();
-      bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-      alert(`Welcome back, ${currentUser}!`);
-    } else alert('Incorrect username or password!');
-  }
-});
-
-document.addEventListener('click', e => {
-  if (e.target.id === 'logoutBtn') {
-    if (confirm('Log out?')) {
-      isLoggedIn = false;
-      currentUser = null;
-      localStorage.setItem('isLoggedIn', 'false');
-      localStorage.removeItem('currentUser');
-      updateUI();
-      alert('Logged out. Your cart is saved!');
+    if (['QRPH', 'GCash', 'Maya', 'ShopeePay'].includes(paymentMethod)) {
+      receiptUpload.required = true;
+      receiptUpload.setAttribute('required', '');
+    } else {
+      receiptUpload.required = false;
+      receiptUpload.removeAttribute('required');
     }
-  }
+  };
 
-  if (e.target.id === 'checkoutBtn') {
-    const currentCart = getCart();
-    if (currentCart.length === 0) return alert('Cart is empty!');
-    bootstrap.Modal.getInstance(document.getElementById('cartModal'))?.hide();
-    new bootstrap.Modal(document.getElementById('paymentDetailsModal')).show();
-  }
-});
+  document.addEventListener('submit', e => {
+    if (e.target.id === 'loginForm') {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberMe').checked;
 
-document.addEventListener('submit', e => {
-  if (e.target.id === 'paymentDetailsForm') {
-    e.preventDefault();
+      if (users[username] && users[username] === password) {
+        isLoggedIn = true;
+        currentUser = username.charAt(0).toUpperCase() + username.slice(1);
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', currentUser);
+        if (remember) {
+          localStorage.setItem('rememberedCredentials', JSON.stringify({ username, password }));
+        } else {
+          localStorage.removeItem('rememberedCredentials');
+        }
+        updateUI();
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+        alert(`Welcome back, ${currentUser}!`);
+      } else {
+        alert('Incorrect username or password!');
+      }
+    }
+  });
 
-    // 🔑 FORCE receipt OFF for COD & BANKS before validation
-    forceDisableReceiptIfNotQR();
-
-    if (!e.target.checkValidity()) {
-      e.target.classList.add('was-validated');
-      return;
+  document.addEventListener('click', e => {
+    if (e.target.id === 'logoutBtn') {
+      if (confirm('Log out?')) {
+        isLoggedIn = false;
+        currentUser = null;
+        localStorage.setItem('isLoggedIn', 'false');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberedCredentials');
+        updateUI();
+        alert('Logged out. Your cart is saved!');
+      }
     }
 
-    const name = document.getElementById('payerName').value.trim();
-    const email = document.getElementById('payerEmail').value.trim();
-    const address = document.getElementById('payerAddress').value.trim();
-    const paymentMethod = document.getElementById('paymentMethod').value;
+    if (e.target.id === 'checkoutBtn') {
+      const currentCart = getCart();
+      if (currentCart.length === 0) {
+        alert('Cart is empty!');
+        return;
+      }
+      bootstrap.Modal.getInstance(document.getElementById('cartModal'))?.hide();
+      new bootstrap.Modal(document.getElementById('paymentDetailsModal')).show();
+    }
+  });
 
-    const subtotal = calculateTotal();
-    const shipping = subtotal >= 5000 ? 0 : 150;
-    let grandTotal = subtotal + shipping;
+  document.addEventListener('submit', e => {
+    if (e.target.id === 'paymentDetailsForm') {
+      e.preventDefault();
 
-    const displayedGrand =
-      parseInt(
-        document
-          .getElementById('grandTotalAmount')
-          .textContent.replace(/[^0-9]/g, '')
-      ) || grandTotal;
+      forceDisableReceiptIfNotQR();
 
-    grandTotal = displayedGrand;
+      const form = e.target;
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+      }
 
-    emailjs.send('service_438wssi', 'template_j27m6cr', {
-      to_name: name,
-      to_email: email,
-      total: '₱' + grandTotal.toLocaleString(),
-      payment_method: paymentMethod,
-      order_items: getCart()
-        .map(item => `${item.name} × ${item.qty}`)
-        .join('\n'),
-      delivery_address: address
-    });
+      const name = document.getElementById('payerName').value.trim();
+      const email = document.getElementById('payerEmail').value.trim();
+      const address = document.getElementById('payerAddress').value.trim();
+      const paymentMethod = document.getElementById('paymentMethod').value;
 
-    document.getElementById('paymentSummary').textContent =
-      `Total: ₱${grandTotal.toLocaleString()} • Payment: ${paymentMethod}`;
+      const subtotal = calculateTotal();
+      const shipping = subtotal >= 5000 ? 0 : 150;
+      let grandTotal = subtotal + shipping;
 
-    bootstrap.Modal.getInstance(
-      document.getElementById('paymentDetailsModal')
-    ).hide();
+      const displayedGrand = parseInt(document.getElementById('grandTotalAmount').textContent.replace(/[^0-9]/g, '')) || grandTotal;
+      grandTotal = displayedGrand;
 
-    new bootstrap.Modal(
-      document.getElementById('successModal')
-    ).show();
+      emailjs.send('service_438wssi', 'template_j27m6cr', {
+        to_name: name,
+        to_email: email,
+        total: '₱' + grandTotal.toLocaleString('en-PH'),
+        payment_method: paymentMethod,
+        order_items: getCart()
+          .map(item => `${item.name} ${item.motorcycle && item.motorcycle !== 'Universal' ? `(${item.motorcycle})` : ''} × ${item.qty}`)
+          .join('\n'),
+        delivery_address: address
+      }).then(() => {
+        console.log('Order email sent successfully!');
+      }).catch((err) => {
+        console.error('EmailJS error:', err);
+        alert('Order placed! (Email notification may be delayed)');
+      });
 
-    saveCart([]);
-    updateUI();
+      document.getElementById('paymentSummary').textContent =
+        `Total: ₱${grandTotal.toLocaleString('en-PH')} • Payment: ${paymentMethod}`;
 
-    document
-      .getElementById('successModal')
-      .addEventListener(
-        'hidden.bs.modal',
-        () =>
-          new bootstrap.Modal(
-            document.getElementById('emailSentModal')
-          ).show(),
-        { once: true }
-      );
-  }
+      bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
+      new bootstrap.Modal(document.getElementById('successModal')).show();
+
+      saveCart([]);
+      updateUI();
+
+      document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
+        new bootstrap.Modal(document.getElementById('emailSentModal')).show();
+      }, { once: true });
+    }
+  });
 });
 
-
-// Initial update
+// Initial UI update
 updateUI();

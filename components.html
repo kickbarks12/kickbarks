@@ -149,17 +149,16 @@
       </div>
       <div class="modal-body">
         <form id="paymentDetailsForm" class="needs-validation" novalidate>
-          <!-- 1. PROMINENT TOTAL DISPLAY -->
+          <!-- 1. PROMINENT TOTAL -->
           <div
             class="alert alert-primary text-center fw-bold fs-4 mb-4 shadow-sm rounded"
-            id="orderTotalDisplay"
           >
             <i class="bi bi-cart4 me-2"></i>
             Order Total: ₱<span id="orderTotalAmount">0</span>
           </div>
 
-          <!-- 2. CART ITEMS SUMMARY (COLLAPSIBLE) -->
-          <div class="accordion mb-4" id="cartSummaryAccordion">
+          <!-- 2. CART SUMMARY (COLLAPSIBLE) -->
+          <div class="accordion mb-4">
             <div class="accordion-item">
               <h2 class="accordion-header">
                 <button
@@ -183,7 +182,7 @@
             </div>
           </div>
 
-          <!-- 3. SHIPPING FEE & FINAL TOTAL BREAKDOWN -->
+          <!-- 3. PRICE BREAKDOWN -->
           <div class="card border-primary mb-4">
             <div class="card-body">
               <div class="row g-3 text-muted">
@@ -207,7 +206,7 @@
             </div>
           </div>
 
-          <!-- 4. PROMO CODE FIELD -->
+          <!-- 4. PROMO CODE -->
           <div class="input-group mb-4">
             <input
               type="text"
@@ -222,11 +221,12 @@
             >
               Apply
             </button>
-            <div class="invalid-feedback d-block mt-1" id="promoFeedback"></div>
           </div>
+          <div id="promoFeedback" class="mt-1"></div>
 
-          <!-- Rest of your form (personal info, payment method, etc.) -->
-          <div class="row g-3">
+          <!-- 5. CUSTOMER INFORMATION -->
+          <h5 class="mb-3">Customer Information</h5>
+          <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label class="form-label">Full Name *</label>
               <input type="text" class="form-control" id="payerName" required />
@@ -260,7 +260,6 @@
                 id="payerBirthday"
                 placeholder="e.g. 01/01/2000"
                 pattern="(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(19|20)\d\d"
-                title="Please enter date as MM/DD/YYYY"
                 required
               />
               <small class="text-muted">Format: MM/DD/YYYY</small>
@@ -277,79 +276,79 @@
               />
               <div class="invalid-feedback">You must be 18+</div>
             </div>
+          </div>
 
-            <!-- Payment Method & QR (unchanged) -->
-            <div class="col-12">
-              <label class="form-label">Payment Method *</label>
-              <select class="form-select" id="paymentMethod" required>
-                <option value="">-- Choose Payment Method --</option>
-                <option value="QRPH" data-qr="./image/QR.png">
-                  QRPH (Scan to Pay - Any E-Wallet/Bank)
-                </option>
-                <option value="GCash" data-qr="/image/gcash.png">GCash</option>
-                <option value="Maya" data-qr="/image/maya.png">Maya</option>
-                <option value="ShopeePay" data-qr="/image/shopeepay.png">
-                  ShopeePay
-                </option>
-                <option
-                  value="BDO"
-                  data-url="https://www.bdo.com.ph/personal/online-banking"
-                >
-                  BDO Online Banking
-                </option>
-                <option
-                  value="BPI"
-                  data-url="https://www.bpi.com.ph/personal/bank/online"
-                >
-                  BPI Online Banking
-                </option>
-                <option
-                  value="Metrobank"
-                  data-url="https://www.metrobank.com.ph/personal/online-banking"
-                >
-                  Metrobank Online Banking
-                </option>
-                <option value="COD">Cash on Delivery (COD)</option>
-              </select>
+          <!-- 6. PAYMENT METHOD -->
+          <div class="col-12">
+            <label class="form-label">Payment Method *</label>
+            <select class="form-select" id="paymentMethod" required>
+              <option value="">-- Choose Payment Method --</option>
+              <option value="QRPH" data-qr="./image/QR.png">
+                QRPH (Scan to Pay - Any E-Wallet/Bank)
+              </option>
+              <option value="GCash" data-qr="./image/gcash.png">GCash</option>
+              <option value="Maya" data-qr="./image/maya.png">Maya</option>
+              <option value="ShopeePay" data-qr="./image/shopeepay.png">
+                ShopeePay
+              </option>
+              <option
+                value="BDO"
+                data-url="https://www.bdo.com.ph/personal/online-banking"
+              >
+                BDO Online Banking
+              </option>
+              <option
+                value="BPI"
+                data-url="https://www.bpi.com.ph/personal/bank/online"
+              >
+                BPI Online Banking
+              </option>
+              <option
+                value="Metrobank"
+                data-url="https://www.metrobank.com.ph/personal/online-banking"
+              >
+                Metrobank Online Banking
+              </option>
+              <option value="COD">Cash on Delivery (COD)</option>
+            </select>
 
-              <!-- QR / Receipt Section -->
-              <div id="qrCodeContainer" class="text-center mt-4 d-none">
-                <p class="fw-bold mb-3">Scan to Pay with QRPH</p>
-                <img
-                  id="qrCodeImage"
-                  src=""
-                  alt="QR Code"
-                  class="img-fluid border rounded shadow"
-                  style="max-width: 300px"
+            <!-- QR / Receipt Section -->
+            <div id="qrCodeContainer" class="text-center mt-4 d-none">
+              <p class="fw-bold mb-3" id="qrInstructionText">
+                Scan to pay using selected method
+              </p>
+              <img
+                id="qrCodeImage"
+                src=""
+                alt="QR Code"
+                class="img-fluid border rounded shadow"
+                style="max-width: 300px"
+              />
+              <p class="text-muted small mt-3">
+                After payment, upload your receipt below to complete the order.
+              </p>
+              <div class="mt-4" id="receiptSection">
+                <label for="receiptUpload" class="form-label fw-bold"
+                  >Upload Receipt *</label
+                >
+                <input
+                  type="file"
+                  class="form-control"
+                  id="receiptUpload"
+                  accept="image/*"
                 />
-                <p class="text-muted small mt-3">
-                  After payment, upload your receipt below to complete the
-                  order.
-                </p>
-                <div class="mt-4">
-                  <label for="receiptUpload" class="form-label fw-bold">
-                    Upload Receipt *
-                  </label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="receiptUpload"
-                    accept="image/*"
-                    disabled
-                  />
-                  <small class="text-muted">
-                    Take a screenshot or photo of your payment receipt.
-                  </small>
-                </div>
+                <small class="text-muted"
+                  >Take a screenshot or photo of your payment receipt.</small
+                >
               </div>
-
-              <p class="text-muted small mt-2 d-none" id="receiptRequired">
+              <p class="text-muted small mt-3 d-none" id="receiptRequired">
                 Please upload your payment receipt to continue.
               </p>
             </div>
           </div>
 
-          <div class="mt-4 text-center">
+          <!-- SUBMIT BUTTON -->
+          <div class="mt-5 text-center">
             <button
               type="submit"
               class="btn btn-success btn-lg px-5"
@@ -357,13 +356,10 @@
             >
               Submit Order
             </button>
-            <p class="text-muted small mt-2" id="receiptRequired">
-              Please upload your payment receipt to continue.
-            </p>
           </div>
 
-          <!-- Terms note -->
-          <p class="text-center text-muted small mt-3">
+          <!-- TERMS -->
+          <p class="text-center text-muted small mt-4">
             By submitting, you agree to our
             <a href="#" class="text-decoration-underline">Terms of Service</a>
             and
