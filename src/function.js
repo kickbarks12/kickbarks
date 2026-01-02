@@ -1,3 +1,16 @@
+
+// ================= EMAILJS INIT (GLOBAL) =================
+(function () {
+  if (typeof emailjs !== "undefined") {
+    emailjs.init("qFyIf-WQG3wo4lvW-"); // ✅ your public key
+    console.log("EmailJS initialized");
+  } else {
+    console.error("EmailJS not loaded");
+  }
+})();
+
+
+
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 let currentUser = localStorage.getItem('currentUser') || null;
 
@@ -15,6 +28,20 @@ const products = [
 ];
 
 const brands = [...new Set(products.map(p => p.brand))].sort();
+
+// === ORDER REFERENCE GENERATOR ===
+function generateOrderRef() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const rand = Math.floor(100000 + Math.random() * 900000);
+  return `KB-${y}${m}${day}-${rand}`;
+}
+
+// === DEFAULT ORDER STATUS ===
+const DEFAULT_ORDER_STATUS = 'Pending';
+
 
 // === CART HELPERS ===
 const getCart = () => JSON.parse(localStorage.getItem('cart')) || [];
@@ -41,6 +68,38 @@ function renderBrands() {
     brandContainer.appendChild(col);
   });
 }
+
+// === ORDER STATUS FLOW ===
+const ORDER_STATUSES = [
+  { label: 'Pending', class: 'bg-warning text-dark' },
+  { label: 'Confirmed', class: 'bg-info text-dark' },
+  { label: 'Shipped', class: 'bg-primary' },
+  { label: 'Delivered', class: 'bg-success' }
+];
+
+function autoUpdateOrderStatus() {
+  const statusEl = document.getElementById('orderStatusText');
+  if (!statusEl) return;
+
+  let index = 0;
+
+  function updateStatus() {
+    if (index >= ORDER_STATUSES.length) return;
+
+    statusEl.textContent = ORDER_STATUSES[index].label;
+    statusEl.className = `badge ${ORDER_STATUSES[index].class}`;
+
+    index++;
+
+    // Delay before next status
+    if (index < ORDER_STATUSES.length) {
+      setTimeout(updateStatus, 3000); // ⏱ 3 seconds per stage
+    }
+  }
+
+  updateStatus();
+}
+
 
 function renderProducts(filtered = products) {
   if (!productContainer) return;
@@ -421,10 +480,15 @@ document.addEventListener('DOMContentLoaded', () => {
       forceDisableReceiptIfNotQR();
 
       const form = e.target;
-      if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        return;
-      }
+if (!form.checkValidity()) {
+  form.classList.add('was-validated');
+  return;
+}
+
+const orderRef = generateOrderRef(); // ✅ ADD
+const orderStatus = DEFAULT_ORDER_STATUS;
+
+
 
       const name = document.getElementById('payerName').value.trim();
       const email = document.getElementById('payerEmail').value.trim();
@@ -439,26 +503,62 @@ document.addEventListener('DOMContentLoaded', () => {
       grandTotal = displayedGrand;
 
       emailjs.send('service_438wssi', 'template_j27m6cr', {
-        to_name: name,
-        to_email: email,
-        total: '₱' + grandTotal.toLocaleString('en-PH'),
-        payment_method: paymentMethod,
-        order_items: getCart()
-          .map(item => `${item.name} ${item.motorcycle && item.motorcycle !== 'Universal' ? `(${item.motorcycle})` : ''} × ${item.qty}`)
-          .join('\n'),
-        delivery_address: address
-      }).then(() => {
-        console.log('Order email sent successfully!');
-      }).catch((err) => {
-        console.error('EmailJS error:', err);
-        alert('Order placed! (Email notification may be delayed)');
-      });
+  order_ref: orderRef, // ✅ ADD
+  to_name: name,
+  to_email: email,
+  total: '₱' + grandTotal.toLocaleString('en-PH'),
+  payment_method: paymentMethod,
+  order_items: getCart()
+    .map(item =>
+      `${item.name} ${item.motorcycle && item.motorcycle !== 'Universal'
+        ? `(${item.motorcycle})`
+        : ''} × ${item.qty}`
+    )
+    .join('\n'),
+  delivery_address: address
+})
+.then(() => {
+  console.log('Order email sent successfully!');
+})
+.catch(err => {
+  console.error('EmailJS error:', err);
+  alert('Order placed! (Email notification may be delayed)');
+});
+
 
       document.getElementById('paymentSummary').textContent =
         `Total: ₱${grandTotal.toLocaleString('en-PH')} • Payment: ${paymentMethod}`;
 
+        const statusEl = document.getElementById('orderStatusText');
+if (statusEl) {
+  statusEl.textContent = orderStatus;
+
+  // Optional: color based on status
+  statusEl.className = 'badge bg-warning text-dark';
+}
+
+
+        const refEl = document.getElementById('orderRefText');
+if (refEl) {
+  refEl.textContent = `Order Reference: ${orderRef}`;
+}
+
+// === SAVE ORDER FOR TRACKING ===
+const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+orders.push({
+  reference: orderRef,
+  status: orderStatus,
+  date: new Date().toISOString()
+});
+
+localStorage.setItem('orders', JSON.stringify(orders));
+
+
       bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
       new bootstrap.Modal(document.getElementById('successModal')).show();
+      autoUpdateOrderStatus(); // 🚀 start automatic status changes
+
 
       saveCart([]);
       updateUI();

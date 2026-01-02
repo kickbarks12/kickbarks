@@ -12,18 +12,23 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto me-3">
-        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
         <li class="nav-item">
-          <a class="nav-link" href="product.html">Products</a>
+          <a class="nav-link" href="/Index.html">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="aboutus.html">About Us</a>
+          <a class="nav-link" href="/product.html">Products</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="contactus.html">Contact Us</a>
+          <a class="nav-link" href="/aboutus.html">About Us</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="orders.html">Order History</a>
+          <a class="nav-link" href="/contactus.html">Contact Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/orderhistory.html">Order History</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/trackorder/trackorder.html">Track Order</a>
         </li>
       </ul>
       <ul class="navbar-nav">
@@ -232,16 +237,20 @@
               <input type="text" class="form-control" id="payerName" required />
               <div class="invalid-feedback">Please enter your name</div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Email *</label>
+            <div class="mb-3">
+              <label for="payerEmail" class="form-label">Email Address</label>
               <input
                 type="email"
                 class="form-control"
                 id="payerEmail"
+                placeholder="example@email.com"
                 required
               />
-              <div class="invalid-feedback">Please enter a valid email</div>
+              <div class="invalid-feedback">
+                Please enter a valid email address.
+              </div>
             </div>
+
             <div class="col-12">
               <label class="form-label">Delivery Address *</label>
               <textarea
@@ -383,7 +392,17 @@
       </div>
       <h3>Order Placed Successfully!</h3>
       <p class="lead" id="paymentSummary"></p>
+
+      <p class="fw-bold text-primary" id="orderRefText"></p>
+      <p class="fw-semibold mt-1">
+        Order Status:
+        <span id="orderStatusText" class="badge bg-warning text-dark">
+          Pending
+        </span>
+      </p>
+
       <p class="text-muted">We will contact you soon for delivery details.</p>
+
       <button
         type="button"
         class="btn btn-success px-5"
