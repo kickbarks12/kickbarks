@@ -152,43 +152,71 @@ function updateUI() {
   const loginItem = document.getElementById('loginItem');
   const signupItem = document.getElementById('signupItem');
   const logoutBtn = document.getElementById('logoutBtn');
+  const orderHistoryLink = document.getElementById('orderHistoryLink');
 
+  // === ACCOUNT UI ===
   if (accountDropdown) {
     if (isLoggedIn) {
       loginItem.style.display = 'none';
       signupItem.style.display = 'none';
       logoutBtn.style.display = 'block';
       accountDropdown.innerHTML = `Hello, ${currentUser}`;
+
       if (cartBtn) cartBtn.style.display = 'inline-block';
+      if (orderHistoryLink) orderHistoryLink.style.display = 'block';
     } else {
       loginItem.style.display = 'block';
       signupItem.style.display = 'block';
       logoutBtn.style.display = 'none';
       accountDropdown.textContent = 'Account';
+
       if (cartBtn) cartBtn.style.display = 'none';
+      if (orderHistoryLink) orderHistoryLink.style.display = 'none';
     }
   }
 
+  // === CART COUNT ===
   if (cartCount) cartCount.textContent = currentCart.length;
 
+  // === CART MODAL ===
   if (cartItemsDiv && cartTotalSpan) {
     cartItemsDiv.innerHTML = '';
     let total = 0;
+
     if (currentCart.length === 0) {
       cartItemsDiv.innerHTML = '<p class="text-muted">Your cart is empty.</p>';
     } else {
       currentCart.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'd-flex justify-content-between align-items-center mb-3 pb-2 border-bottom';
-        div.innerHTML = `<div><strong>${item.name}</strong><br>${item.motorcycle && item.motorcycle !== 'Universal' ? `<small class="text-success">→ ${item.motorcycle}</small><br>` : ''}<small>× ${item.qty}</small></div>
-          <div class="text-end"><strong>₱${(item.price * item.qty).toLocaleString()}</strong><br><button class="btn btn-sm btn-danger mt-1" onclick="removeFromCart(${i})">Remove</button></div>`;
+
+        div.innerHTML = `
+          <div>
+            <strong>${item.name}</strong><br>
+            ${
+              item.motorcycle && item.motorcycle !== 'Universal'
+                ? `<small class="text-success">→ ${item.motorcycle}</small><br>`
+                : ''
+            }
+            <small>× ${item.qty}</small>
+          </div>
+          <div class="text-end">
+            <strong>₱${(item.price * item.qty).toLocaleString()}</strong><br>
+            <button class="btn btn-sm btn-danger mt-1" onclick="removeFromCart(${i})">
+              Remove
+            </button>
+          </div>
+        `;
+
         cartItemsDiv.appendChild(div);
         total += item.price * item.qty;
       });
     }
+
     cartTotalSpan.textContent = total.toLocaleString();
   }
 }
+
 
 window.removeFromCart = function(i) {
   const currentCart = getCart();
@@ -239,6 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderBrands();
   renderProducts();
   attachAddToCartButtons();
+  renderOrderHistory();
+
 
   brandContainer?.addEventListener('click', e => {
     const link = e.target.closest('[data-brand]');
@@ -543,16 +573,24 @@ if (refEl) {
   refEl.textContent = `Order Reference: ${orderRef}`;
 }
 
-// === SAVE ORDER FOR TRACKING ===
+
+// === SAVE ORDER FOR TRACKING (WITH ITEMS) ===
 const orders = JSON.parse(localStorage.getItem('orders')) || [];
 
 orders.push({
   reference: orderRef,
   status: orderStatus,
-  date: new Date().toISOString()
+  date: new Date().toISOString(),
+  items: getCart().map(item => ({
+    name: item.name,
+    qty: item.qty,
+    price: item.price,
+    motorcycle: item.motorcycle || 'Universal'
+  }))
 });
 
 localStorage.setItem('orders', JSON.stringify(orders));
+
 
 
       bootstrap.Modal.getInstance(document.getElementById('paymentDetailsModal')).hide();
@@ -572,3 +610,68 @@ localStorage.setItem('orders', JSON.stringify(orders));
 
 // Initial UI update
 updateUI();
+
+// ================= ORDER HISTORY PAGE =================
+function renderOrderHistory() {
+  const tbody = document.getElementById("orderHistoryBody");
+  const noOrdersMessage = document.getElementById("noOrdersMessage");
+
+  if (!tbody || !noOrdersMessage) return;
+
+  if (!isLoggedIn) {
+    alert("Please login to view your order history.");
+    location.href = "/index.html";
+    return;
+  }
+
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  if (orders.length === 0) {
+    noOrdersMessage.classList.remove("d-none");
+    return;
+  }
+
+  tbody.innerHTML = "";
+
+  orders.slice().reverse().forEach(order => {
+    const tr = document.createElement("tr");
+
+    const date = new Date(order.date).toLocaleString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    let statusClass = "bg-secondary";
+    if (order.status === "Pending") statusClass = "bg-warning text-dark";
+    if (order.status === "Confirmed") statusClass = "bg-info text-dark";
+    if (order.status === "Shipped") statusClass = "bg-primary";
+    if (order.status === "Delivered") statusClass = "bg-success";
+
+    const itemsHtml = order.items
+      ? order.items.map(item => `
+          <div class="small">
+            • ${item.name}
+            ${item.motorcycle !== 'Universal' ? `(${item.motorcycle})` : ''}
+            × ${item.qty}
+          </div>
+        `).join("")
+      : `<div class="text-muted small">No item data</div>`;
+
+    tr.innerHTML = `
+      <td class="fw-bold">${order.reference}</td>
+      <td>${date}</td>
+      <td>${itemsHtml}</td>
+      <td>
+        <span class="badge ${statusClass}">
+          ${order.status}
+        </span>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
