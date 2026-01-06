@@ -112,6 +112,8 @@ function renderProducts(filtered = products) {
     const col = document.createElement('div');
     col.className = 'col-md-3 mb-4 product-card';
     col.setAttribute('data-category', p.category || 'all');
+    col.setAttribute('data-id', p.id);
+
 
     let badge = '';
     if (p.badge === 'new') badge = '<span class="product-badge new">NEW</span>';
@@ -191,22 +193,40 @@ function updateUI() {
         div.className = 'd-flex justify-content-between align-items-center mb-3 pb-2 border-bottom';
 
         div.innerHTML = `
-          <div>
-            <strong>${item.name}</strong><br>
-            ${
-              item.motorcycle && item.motorcycle !== 'Universal'
-                ? `<small class="text-success">→ ${item.motorcycle}</small><br>`
-                : ''
-            }
-            <small>× ${item.qty}</small>
-          </div>
-          <div class="text-end">
-            <strong>₱${(item.price * item.qty).toLocaleString()}</strong><br>
-            <button class="btn btn-sm btn-danger mt-1" onclick="removeFromCart(${i})">
-              Remove
-            </button>
-          </div>
-        `;
+  <div>
+    <strong>${item.name}</strong><br>
+    ${
+      item.motorcycle && item.motorcycle !== 'Universal'
+        ? `<small class="text-success">→ ${item.motorcycle}</small><br>`
+        : ''
+    }
+
+    <div class="d-flex align-items-center gap-2 mt-1">
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        onclick="decreaseQty(${i})"
+      >➖</button>
+
+      <span class="fw-bold">${item.qty}</span>
+
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        onclick="increaseQty(${i})"
+      >➕</button>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <strong>₱${(item.price * item.qty).toLocaleString()}</strong><br>
+    <button
+      class="btn btn-sm btn-danger mt-1"
+      onclick="removeFromCart(${i})"
+    >
+      Remove
+    </button>
+  </div>
+`;
+
 
         cartItemsDiv.appendChild(div);
         total += item.price * item.qty;
@@ -225,18 +245,38 @@ window.removeFromCart = function(i) {
   updateUI();
 };
 
-window.addToCart = function(name, price, qty = 1, motorcycle = '') {
+window.addToCart = function(id, name, price, qty = 1, motorcycle = 'Universal') {
   if (!isLoggedIn) {
     alert('Please login first!');
     new bootstrap.Modal(document.getElementById('loginModal')).show();
     return;
   }
+
   const currentCart = getCart();
-  currentCart.push({ name, price, qty: parseInt(qty), motorcycle: motorcycle || 'Universal' });
+  const quantity = parseInt(qty);
+
+  // 🔍 check if same product + same motorcycle already exists
+  const existingItem = currentCart.find(
+    item => item.id === id && item.motorcycle === motorcycle
+  );
+
+  if (existingItem) {
+    existingItem.qty += quantity; // ✅ INCREASE QTY
+  } else {
+    currentCart.push({
+      id,
+      name,
+      price,
+      qty: quantity,
+      motorcycle
+    });
+  }
+
   saveCart(currentCart);
   updateUI();
-  alert('Added to cart!');
+  alert('Item added to cart!');
 };
+
 
 function attachAddToCartButtons() {
   document.querySelectorAll('.add-to-cart').forEach(btn => {
@@ -252,7 +292,9 @@ function attachAddToCartButtons() {
         return;
       }
       if (warning) warning.classList.add('d-none');
-      addToCart(name, price, qty, select ? select.value : '');
+      const id = parseInt(card.closest('.product-card').dataset.id);
+addToCart(id, name, price, qty, select ? select.value : 'Universal');
+
     };
   });
 }
@@ -579,15 +621,18 @@ const orders = JSON.parse(localStorage.getItem('orders')) || [];
 
 orders.push({
   reference: orderRef,
+  user: currentUser, 
   status: orderStatus,
   date: new Date().toISOString(),
   items: getCart().map(item => ({
+    id: item.id,
     name: item.name,
     qty: item.qty,
     price: item.price,
     motorcycle: item.motorcycle || 'Universal'
   }))
 });
+
 
 localStorage.setItem('orders', JSON.stringify(orders));
 
@@ -675,3 +720,23 @@ function renderOrderHistory() {
   });
 }
 
+// ================= CART QTY CONTROLS =================
+window.increaseQty = function (index) {
+  const cart = getCart();
+  cart[index].qty += 1;
+  saveCart(cart);
+  updateUI();
+};
+
+window.decreaseQty = function (index) {
+  const cart = getCart();
+
+  if (cart[index].qty > 1) {
+    cart[index].qty -= 1;
+  } else {
+    cart.splice(index, 1); // remove item if qty becomes 0
+  }
+
+  saveCart(cart);
+  updateUI();
+};
