@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Admin – Update Order Status</title>
+    <title>Admin – Order Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <!-- ===== ADMIN ORDERS ===== -->
+      <!-- ===== ADMIN DASHBOARD ===== -->
       <div id="adminOrdersBox" class="d-none">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h3>Admin – Order Management</h3>
@@ -51,22 +51,95 @@
           </button>
         </div>
 
+        <!-- ===== ANALYTICS DASHBOARD ===== -->
+        <div class="row g-3 mb-4" id="analyticsDashboard">
+          <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+              <div class="card-body">
+                <h6 class="text-muted">Total Orders</h6>
+                <h3 id="totalOrders">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+              <div class="card-body">
+                <h6 class="text-muted">Total Revenue</h6>
+                <h3>₱<span id="totalRevenue">0</span></h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+              <div class="card-body">
+                <h6 class="text-muted">Today’s Orders</h6>
+                <h3 id="todayOrders">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+              <div class="card-body">
+                <h6 class="text-muted">Pending Orders</h6>
+                <h3 id="pendingOrders">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+              <div class="card-body">
+                <h6 class="text-muted">Complete Orders</h6>
+                <h3 id="completedOrders">0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="table-responsive">
           <table class="table table-bordered align-middle text-center">
             <thead class="table-dark">
               <tr>
                 <th>Order Reference</th>
+                <th>Customer</th>
+                <th>Order Date</th>
                 <th>Status</th>
                 <th>Update Status</th>
               </tr>
             </thead>
+
             <tbody id="orderTableBody"></tbody>
           </table>
         </div>
+        <!-- ===== CHARTS ===== -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h6 class="text-center text-muted mb-3">Daily Orders</h6>
+                <canvas id="ordersChart"></canvas>
+              </div>
+            </div>
+          </div>
 
-        <p id="adminMsg" class="mt-3 text-center"></p>
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h6 class="text-center text-muted mb-3">Daily Revenue</h6>
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p id="adminMsg" class="mt-3 text-center text-muted"></p>
       </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="/admin/admin.js"></script>
   </body>

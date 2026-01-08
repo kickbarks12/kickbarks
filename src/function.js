@@ -1,4 +1,9 @@
 
+let currentOrderPage = Number(sessionStorage.getItem("orderPage")) || 1;
+const ORDERS_PER_PAGE = 10;
+
+
+
 // ================= EMAILJS INIT (GLOBAL) =================
 (function () {
   if (typeof emailjs !== "undefined") {
@@ -8,6 +13,7 @@
     console.error("EmailJS not loaded");
   }
 })();
+
 
 
 
@@ -479,6 +485,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  
+
   // === SIMPLIFIED forceDisableReceiptIfNotQR ===
   const forceDisableReceiptIfNotQR = () => {
     const paymentMethod = document.getElementById('paymentMethod')?.value || '';
@@ -653,41 +661,51 @@ localStorage.setItem('orders', JSON.stringify(orders));
   });
 });
 
+
+
 // Initial UI update
 updateUI();
 
-// ================= ORDER HISTORY PAGE =================
+
+
 function renderOrderHistory() {
   const tbody = document.getElementById("orderHistoryBody");
   const noOrdersMessage = document.getElementById("noOrdersMessage");
+  const pageNumbers = document.getElementById("pageNumbers");
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
 
   if (!tbody || !noOrdersMessage) return;
-
-  if (!isLoggedIn) {
-    alert("Please login to view your order history.");
-    location.href = "/index.html";
-    return;
-  }
+  if (!isLoggedIn) return;
 
   const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const reversed = orders.slice().reverse();
 
-  if (orders.length === 0) {
+  if (reversed.length === 0) {
     noOrdersMessage.classList.remove("d-none");
+    tbody.innerHTML = "";
+    if (pageNumbers) pageNumbers.innerHTML = "";
     return;
   }
+
+  const totalPages = Math.ceil(reversed.length / ORDERS_PER_PAGE);
+
+// 🔒 clamp WITHOUT resetting
+currentOrderPage = Math.min(Math.max(currentOrderPage, 1), totalPages);
+
+// persist page
+sessionStorage.setItem("orderPage", currentOrderPage);
+
+
+  const start = (currentOrderPage - 1) * ORDERS_PER_PAGE;
+  const pageOrders = reversed.slice(start, start + ORDERS_PER_PAGE);
 
   tbody.innerHTML = "";
 
-  orders.slice().reverse().forEach(order => {
+  pageOrders.forEach(order => {
     const tr = document.createElement("tr");
 
-    const date = new Date(order.date).toLocaleString("en-PH", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    const date = new Date(order.date).toLocaleString("en-PH");
 
     let statusClass = "bg-secondary";
     if (order.status === "Pending") statusClass = "bg-warning text-dark";
@@ -695,30 +713,67 @@ function renderOrderHistory() {
     if (order.status === "Shipped") statusClass = "bg-primary";
     if (order.status === "Delivered") statusClass = "bg-success";
 
-    const itemsHtml = order.items
-      ? order.items.map(item => `
-          <div class="small">
-            • ${item.name}
-            ${item.motorcycle !== 'Universal' ? `(${item.motorcycle})` : ''}
-            × ${item.qty}
-          </div>
-        `).join("")
-      : `<div class="text-muted small">No item data</div>`;
+    const itemsHtml = order.items.map(i =>
+      `<div class="small">• ${i.name} × ${i.qty}</div>`
+    ).join("");
 
     tr.innerHTML = `
       <td class="fw-bold">${order.reference}</td>
       <td>${date}</td>
       <td>${itemsHtml}</td>
-      <td>
-        <span class="badge ${statusClass}">
-          ${order.status}
-        </span>
-      </td>
+      <td><span class="badge ${statusClass}">${order.status}</span></td>
     `;
 
     tbody.appendChild(tr);
   });
+
+  // ===== PAGE NUMBERS =====
+pageNumbers.innerHTML = "";
+
+for (let i = 1; i <= totalPages; i++) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+
+  btn.className = `btn btn-sm ${
+    i === currentOrderPage ? "btn-primary" : "btn-outline-secondary"
+  }`;
+
+  btn.textContent = i;
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    currentOrderPage = i;
+    sessionStorage.setItem("orderPage", currentOrderPage);
+    renderOrderHistory();
+  });
+
+  pageNumbers.appendChild(btn);
 }
+
+
+  // Prev / Next
+  prevBtn.disabled = currentOrderPage === 1;
+  nextBtn.disabled = currentOrderPage === totalPages;
+
+  prevBtn.onclick = () => {
+  if (currentOrderPage > 1) {
+    currentOrderPage--;
+    sessionStorage.setItem("orderPage", currentOrderPage);
+    renderOrderHistory();
+  }
+};
+
+nextBtn.onclick = () => {
+  if (currentOrderPage < totalPages) {
+    currentOrderPage++;
+    sessionStorage.setItem("orderPage", currentOrderPage);
+    renderOrderHistory();
+  }
+};
+}
+
 
 // ================= CART QTY CONTROLS =================
 window.increaseQty = function (index) {
@@ -740,3 +795,120 @@ window.decreaseQty = function (index) {
   saveCart(cart);
   updateUI();
 };
+
+
+function initOrderPagination(totalPages) {
+  const prevBtn = document.getElementById("prevPageBtn");
+  const nextBtn = document.getElementById("nextPageBtn");
+
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      if (currentOrderPage > 1) {
+        currentOrderPage--;
+        renderOrderHistory();
+      }
+    };
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      if (currentOrderPage < totalPages) {
+        currentOrderPage++;
+        renderOrderHistory();
+      }
+    };
+  }
+}
+
+
+function renderAdminOrders() {
+  const table = document.getElementById("adminOrderTable");
+  const emptyText = document.getElementById("noAdminOrders");
+
+  if (!table) return;
+
+  // 🔐 Admin-only check
+  if (currentUser !== "Admin") {
+    alert("Access denied.");
+    location.href = "/index.html";
+    return;
+  }
+
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  if (orders.length === 0) {
+    table.innerHTML = "";
+    emptyText.classList.remove("d-none");
+    return;
+  }
+
+  emptyText.classList.add("d-none");
+  table.innerHTML = "";
+
+  orders.slice().reverse().forEach((order, index) => {
+    const tr = document.createElement("tr");
+
+    const date = new Date(order.date).toLocaleString("en-PH");
+
+    tr.innerHTML = `
+      <td class="fw-bold">${order.reference}</td>
+      <td>${order.user || "-"}</td>
+      <td>${date}</td>
+      <td>
+        <span class="badge bg-secondary" id="status-${index}">
+          ${order.status}
+        </span>
+      </td>
+      <td>
+        <select class="form-select form-select-sm" data-index="${index}">
+          <option ${order.status === "Pending" ? "selected" : ""}>Pending</option>
+          <option ${order.status === "Confirmed" ? "selected" : ""}>Confirmed</option>
+          <option ${order.status === "Shipped" ? "selected" : ""}>Shipped</option>
+          <option ${order.status === "Delivered" ? "selected" : ""}>Delivered</option>
+        </select>
+      </td>
+    `;
+
+    table.appendChild(tr);
+  });
+}
+
+document.addEventListener("change", e => {
+  if (e.target.matches("select[data-index]")) {
+    const index = e.target.dataset.index;
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    orders[orders.length - 1 - index].status = e.target.value;
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    renderAdminOrders();
+  }
+});
+
+document.addEventListener("click", e => {
+  if (e.target.id === "clearAllOrdersBtn") {
+    if (!confirm("Clear ALL orders? This cannot be undone.")) return;
+
+    localStorage.removeItem("orders");
+    renderAdminOrders();
+  }
+});
+
+const adminLink = document.getElementById("adminOrdersLink");
+if (adminLink) {
+  adminLink.style.display = currentUser === "Admin" ? "block" : "none";
+}
+
+
+// document.addEventListener("click", e => {
+//   if (e.target.id === "clearOrdersBtn") {
+//     if (!confirm("Are you sure you want to clear all order history?")) return;
+
+//     localStorage.removeItem("orders");
+//     renderOrderHistory();
+
+//     alert("All orders have been cleared.");
+//   }
+// });
+
+// localStorage.removeItem("orders");
