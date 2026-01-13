@@ -160,6 +160,78 @@
   </div>
 </div>
 
+<!-- REVIEW ORDER MODAL -->
+<div class="modal fade" id="reviewOrderModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Review Your Order</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Promo Code -->
+        <div class="input-group mb-4">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter promo code"
+            id="reviewPromoInput"
+          />
+          <button class="btn btn-outline-primary" id="reviewApplyPromo">
+            Apply
+          </button>
+        </div>
+        <div id="reviewPromoFeedback" class="mb-3"></div>
+
+        <!-- Items List -->
+        <div id="reviewItemsList" class="mb-4"></div>
+
+        <!-- Price Breakdown -->
+        <div class="card border-primary">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-8">Items Subtotal</div>
+              <div class="col-4 text-end fw-bold" id="reviewSubtotal">₱0</div>
+
+              <div class="col-8">Shipping Fee</div>
+              <div class="col-4 text-end" id="reviewShipping">₱150</div>
+
+              <div class="col-8 text-success d-none" id="reviewDiscountRow">
+                Discount (KICK10)
+              </div>
+              <div
+                class="col-4 text-end text-success d-none fw-bold"
+                id="reviewDiscountAmount"
+              >
+                -₱0
+              </div>
+
+              <div class="col-12 border-top pt-3 mt-3"></div>
+              <div class="col-8 fw-bold fs-4">Total to Pay</div>
+              <div
+                class="col-4 text-end fw-bold fs-4 text-primary"
+                id="reviewGrandTotal"
+              >
+                ₱0
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-primary btn-lg px-5" id="goToPaymentBtn">
+            Next → Proceed to Payment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- PAYMENT DETAILS MODAL -->
 <div class="modal fade" id="paymentDetailsModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -221,6 +293,22 @@
                   <span class="text-success small">(Free over ₱5,000!)</span>
                 </div>
                 <div class="col-4 text-end" id="shippingFee">₱150</div>
+                <div class="col-8">Discount</div>
+                <div class="col-4 text-end text-success" id="discountAmount">
+                  ₱0
+                </div>
+                <div class="col-12 d-none" id="discountRow">
+                  <div class="border-top pt-2"></div>
+                  <div class="row">
+                    <div class="col-8">Discount (KICK10)</div>
+                    <div
+                      class="col-4 text-end text-success fw-bold"
+                      id="discountAmount"
+                    >
+                      -₱0
+                    </div>
+                  </div>
+                </div>
 
                 <div class="col-12 border-top pt-3"></div>
                 <div class="col-8 fw-bold fs-5">Grand Total</div>

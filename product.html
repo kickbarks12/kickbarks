@@ -62,136 +62,131 @@
         .then((data) => {
           document.getElementById("shared-components").innerHTML = data;
 
-          // Critical: Run these AFTER components are loaded
-          if (typeof updateUI === "function") updateUI(); // Fixes View Cart & Login
+          // Existing UI updates
+          if (typeof updateUI === "function") updateUI();
+
+          // === NEW: Render products and enable search/add-to-cart ===
+          if (typeof renderProducts === "function") renderProducts();
+          if (typeof setupProductSearch === "function") setupProductSearch();
           if (typeof attachAddToCartButtons === "function")
             attachAddToCartButtons();
 
-          // Highlight active nav link
-          const currentPage =
-            location.pathname.split("/").pop() || "index.html";
-          document.querySelectorAll(".nav-link").forEach((link) => {
-            link.classList.remove("active");
-            if (link.getAttribute("href") === currentPage)
-              link.classList.add("active");
-          });
-
-          // Back to Top
-          const backToTop = document.getElementById("backToTop");
-          window.addEventListener("scroll", () => {
-            backToTop.classList.toggle("show", window.scrollY > 300);
-          });
-          backToTop?.addEventListener("click", () =>
-            window.scrollTo({ top: 0, behavior: "smooth" }),
-          );
-
-          // Close Promo Banner
-          document
-            .getElementById("closePromo")
-            ?.addEventListener("click", () => {
-              document.getElementById("promoBanner").style.display = "none";
-            });
-
-          // Messenger Button (replace with your page ID)
-          document
-            .querySelector(".messenger-btn")
-            ?.addEventListener("click", () => {
-              window.open("https://m.me/YOUR_FACEBOOK_PAGE_ID", "_blank");
-            });
-
-          // Navbar shadow on scroll
-          window.addEventListener("scroll", () => {
-            document.body.classList.toggle("scrolled", window.scrollY > 20);
-          });
-
-          // Page Transition
-          document.querySelectorAll(".nav-link").forEach((link) => {
-            link.addEventListener("click", (e) => {
-              const href = link.getAttribute("href");
-              if (
-                href &&
-                href !== "#" &&
-                !href.startsWith("http") &&
-                href !== currentPage
-              ) {
-                e.preventDefault();
-                document
-                  .getElementById("pageTransition")
-                  .classList.add("active");
-                setTimeout(() => (window.location.href = href), 600);
-              }
-            });
-          });
-
-          // Control Submit Button for QRPH
-          const paymentMethodSelect = document.getElementById("paymentMethod");
-          const qrContainer = document.getElementById("qrCodeContainer");
-          const receiptUpload = document.getElementById("receiptUpload");
-          const submitBtn = document.getElementById("submitOrderBtn");
-          const receiptRequired = document.getElementById("receiptRequired");
-
-          paymentMethodSelect?.addEventListener("change", function () {
-            const selectedOption = this.options[this.selectedIndex];
-
-            if (this.value === "QRPH") {
-              const qrUrl = selectedOption.getAttribute("data-qr");
-              if (qrUrl) {
-                document.getElementById("qrCodeImage").src = qrUrl;
-                qrContainer.classList.remove("d-none");
-                receiptUpload.required = true;
-                submitBtn.disabled = true; // Disable until receipt uploaded
-                receiptRequired.classList.remove("d-none");
-              }
-            } else {
-              qrContainer.classList.add("d-none");
-              receiptUpload.required = false;
-              submitBtn.disabled = false; // Enable for other methods
-              receiptRequired.classList.add("d-none");
-            }
-          });
-
-          // Enable button when receipt is uploaded
-          receiptUpload?.addEventListener("change", function () {
-            if (this.files && this.files.length > 0) {
-              submitBtn.disabled = false;
-              receiptRequired.classList.add("d-none");
-            }
-          });
-
-          // (function(){
-          //   emailjs.init("qFyIf-WQG3wo4lvW-("YOUR_PUBLIC_KEY"));
-          // };
-
-          // Smooth page entrance
-          window.addEventListener("load", () => {
-            const t = document.getElementById("pageTransition");
-            if (t) {
-              t.classList.add("active");
-              setTimeout(() => t.classList.remove("active"), 400);
-            }
-          });
-
-          // Welcome Modal (first visit only)
-          const welcomeShown = localStorage.getItem("welcomeShown");
-          if (!welcomeShown) {
-            const modalEl = document.getElementById("welcomeModal");
-            if (modalEl) {
-              const modal = new bootstrap.Modal(modalEl);
-              modal.show();
-              document
-                .getElementById("dontShowAgain")
-                ?.addEventListener("change", function () {
-                  if (this.checked)
-                    localStorage.setItem("welcomeShown", "true");
-                });
-            }
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          document.getElementById("shared-components").innerHTML =
-            "<p class='text-center text-danger p-4'>Navigation failed to load</p>";
+          // ... rest of your existing code (back to top, messenger, etc.)
         });
+
+      // Highlight active nav link
+      const currentPage = location.pathname.split("/").pop() || "index.html";
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.classList.remove("active");
+        if (link.getAttribute("href") === currentPage)
+          link.classList.add("active");
+      });
+
+      // Back to Top
+      const backToTop = document.getElementById("backToTop");
+      window.addEventListener("scroll", () => {
+        backToTop.classList.toggle("show", window.scrollY > 300);
+      });
+      backToTop?.addEventListener("click", () =>
+        window.scrollTo({ top: 0, behavior: "smooth" }),
+      );
+
+      // Close Promo Banner
+      document.getElementById("closePromo")?.addEventListener("click", () => {
+        document.getElementById("promoBanner").style.display = "none";
+      });
+
+      // Messenger Button (replace with your page ID)
+      document
+        .querySelector(".messenger-btn")
+        ?.addEventListener("click", () => {
+          window.open("https://m.me/YOUR_FACEBOOK_PAGE_ID", "_blank");
+        });
+
+      // Navbar shadow on scroll
+      window.addEventListener("scroll", () => {
+        document.body.classList.toggle("scrolled", window.scrollY > 20);
+      });
+
+      // Page Transition
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (
+            href &&
+            href !== "#" &&
+            !href.startsWith("http") &&
+            href !== currentPage
+          ) {
+            e.preventDefault();
+            document.getElementById("pageTransition").classList.add("active");
+            setTimeout(() => (window.location.href = href), 600);
+          }
+        });
+      });
+
+      // Control Submit Button for QRPH
+      const paymentMethodSelect = document.getElementById("paymentMethod");
+      const qrContainer = document.getElementById("qrCodeContainer");
+      const receiptUpload = document.getElementById("receiptUpload");
+      const submitBtn = document.getElementById("submitOrderBtn");
+      const receiptRequired = document.getElementById("receiptRequired");
+
+      paymentMethodSelect?.addEventListener("change", function () {
+        const selectedOption = this.options[this.selectedIndex];
+
+        if (this.value === "QRPH") {
+          const qrUrl = selectedOption.getAttribute("data-qr");
+          if (qrUrl) {
+            document.getElementById("qrCodeImage").src = qrUrl;
+            qrContainer.classList.remove("d-none");
+            receiptUpload.required = true;
+            submitBtn.disabled = true; // Disable until receipt uploaded
+            receiptRequired.classList.remove("d-none");
+          }
+        } else {
+          qrContainer.classList.add("d-none");
+          receiptUpload.required = false;
+          submitBtn.disabled = false; // Enable for other methods
+          receiptRequired.classList.add("d-none");
+        }
+      });
+
+      // Enable button when receipt is uploaded
+      receiptUpload?.addEventListener("change", function () {
+        if (this.files && this.files.length > 0) {
+          submitBtn.disabled = false;
+          receiptRequired.classList.add("d-none");
+        }
+      });
+
+      // (function(){
+      //   emailjs.init("qFyIf-WQG3wo4lvW-("YOUR_PUBLIC_KEY"));
+      // };
+
+      // Smooth page entrance
+      window.addEventListener("load", () => {
+        const t = document.getElementById("pageTransition");
+        if (t) {
+          t.classList.add("active");
+          setTimeout(() => t.classList.remove("active"), 400);
+        }
+      });
+
+      // Welcome Modal (first visit only)
+      const welcomeShown = localStorage.getItem("welcomeShown");
+      if (!welcomeShown) {
+        const modalEl = document.getElementById("welcomeModal");
+        if (modalEl) {
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+          document
+            .getElementById("dontShowAgain")
+            ?.addEventListener("change", function () {
+              if (this.checked) localStorage.setItem("welcomeShown", "true");
+            });
+        }
+      }
     </script>
   </body>
 </html>
